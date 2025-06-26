@@ -97,7 +97,7 @@ class LoginControlador:
 
         # Imagen con glow
         label_img = QLabel()
-        pixmap = QPixmap(r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\Imagenes\Img22.jpg")
+        pixmap = QPixmap(r"Imagenes\Img22.jpg")
         if pixmap.isNull():
             label_img.setText("Imagen no encontrada.")
             label_img.setAlignment(Qt.AlignCenter)
@@ -128,7 +128,7 @@ class LoginControlador:
         self.easteregg_window.show()
 
         # 🔊 Sonido arcade
-        self.sonido_easteregg = QSound(r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\Imagenes\539860__yipyep__arcade-trap-loop.wav")
+        self.sonido_easteregg = QSound(r"Imagenes\539860__yipyep__arcade-trap-loop.wav")
         self.sonido_easteregg.play()
         self.colores = ["#00FFFF", "#FF00FF", "#FFFF00", "#FF4444", "#00FF00", "#FFA500"]
         self.color_index = 0
