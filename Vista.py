@@ -69,3 +69,6 @@ class LoginVista(QWidget):
 
         font = QFont("Segoe UI", 10)
         self.setFont(font)
+    def clear(self):
+        self.input_usuario.clear()
+        self.input_password.clear()

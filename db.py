@@ -44,9 +44,9 @@ class ConexionMongo:
                 {
                     "id": str(uuid.uuid4()),
                     "tipo_archivo": "mat",
-                    "nombre_archivo": "ecg.mat",
+                    "nombre_archivo": "enfermo",
                     "fecha": "20/06/2021",
-                    "ruta": "C:/archivos/ecg.mat"
+                    "ruta": "C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosMAT\enfermo.mat"
                 },
                 {
                     "id": str(uuid.uuid4()),
