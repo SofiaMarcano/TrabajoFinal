@@ -29,7 +29,7 @@ class LoginControlador:
             self.modelo.reg_acceso(usuario, tipo is not None)
 
             if tipo:
-                self.vista.error(f"✅ Bienvenido, acceso como usuario tipo: {tipo}")
+                self.vista.error(f" 🐱Bienvenido, acceso como usuario tipo: {tipo}")
                 self.vista.normal()
                 QTimer.singleShot(3000, self.vista.close)  # Espera 1.8 segundos antes de cerrar
 
