@@ -37,7 +37,6 @@ class LoginVista(QWidget):
         layout = QVBoxLayout()
         layout.setSpacing(15)
         layout.setContentsMargins(50, 40, 50, 40)
-        layout.addWidget(self.linea)
         layout.addWidget(self.label_usuario)
         layout.addWidget(self.input_usuario)
         layout.addWidget(self.label_password)

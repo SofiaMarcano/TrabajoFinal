@@ -20,7 +20,7 @@ class LoginControlador:
             fallos = self.modelo.fallos(usuario)
             if fallos >= 5:
                 self.modelo.reg_acceso(usuario, False)
-                self.vista.error("Ha superado el número de intentos permitidos. Espere unos minutos antes de volver a intentarlo.")
+                self.vista.error("Ha superado el número de intentos permitidos.\nEspere unos minutos antes de volver a intentarlo.")
                 self.vista.clear()
                 return
 
@@ -37,7 +37,7 @@ class LoginControlador:
                 #     self.panel = SenalVista()
                 # self.panel.show()
             else:
-                self.vista.error("Usuario o contraseña incorrectos.")
+                self.vista.error(f"Usuario o contraseña incorrectos.\nIntentos fallidos recientes: {fallos}/5")
                 self.vista.clear()
 
         except Exception as e:
