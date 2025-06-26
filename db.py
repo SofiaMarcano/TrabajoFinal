@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-import uuid
 import datetime
 
 class ConexionMongo:
@@ -54,7 +53,7 @@ class ConexionMongo:
                     "ruta": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosMAT\enfermo.mat"
                 },
                 {
-                    "id": ARCH002
+                    "id": "ARCH002",
                     "tipo_archivo": "csv",
                     "nombre_archivo": "datos.csv",
                     "fecha": "20/07/2022",
@@ -69,9 +68,10 @@ class ConexionMongo:
             "fecha": datetime.datetime.now()
         })
     def fallos(self, usuario, minutos=10):
-        limite = datetime.datetime.now() - datetime.timedelta(minutes=minutos)
+        #cuantos intentos fallidos de inicio de sesión ha hecho un usuario en los últimos 10 minutos
+        limite = datetime.datetime.now() - datetime.timedelta(minutes=minutos) #si ahora es 14:20, limite será 14:10.
         return self.__db["accesos"].count_documents({
             "usuario": usuario,
             "exito": False,
-            "fecha": {"$gte": limite}
+            "fecha": {"$gte": limite} #La fecha es mayor o igual a limite
         })
