@@ -18,13 +18,16 @@ class AppBioMedica:
 
         # Conexión e inicialización de MongoDB
         self.mongo = ConexionMongo()
-        self.mongo.ver_o_create()
+        m = self.mongo.ver_o_create()
 
         # MVC
         self.vista = LoginVista()
+        
         self.modelo = ModeloBase(self.mongo)
         self.controlador = LoginControlador(self.vista, self.modelo)
         self.vista.set_controlador(self.controlador)
+        if m:
+            self.controlador.see_inicio(m)
 
     def ejecute(self):
         self.vista.show()

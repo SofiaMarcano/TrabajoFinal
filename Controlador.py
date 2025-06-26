@@ -48,3 +48,9 @@ class LoginControlador:
 
         finally:
             self.vista.normal()
+    def see_inicio(self, mensajes):
+        # Mostrar mensajes de inicio como la creación de base de datos con tiempo
+        delay = 1000
+        for msg in mensajes:
+            QTimer.singleShot(delay, lambda m=msg: self.vista.error(m))
+            delay += 2000

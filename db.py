@@ -16,13 +16,15 @@ class ConexionMongo:
 
     def ver_o_create(self):
         print("Verificando base de datos 🐱...")
-
+        m=[]
         # Crear usuarios
         if self.__db["usuarios"].count_documents({}) == 0:
+            print("La base de datos no encontrada. Creando datos de ejemplo...")
             self.__db["usuarios"].insert_many([
                 {"usuario": "WilliamMora", "password": "12345", "tipo_usuario": "imagen"},
                 {"usuario": "CarmenLucia", "password": "Plumas1", "tipo_usuario": "senal"}
             ])
+            m.append("Base de datos inicializada con usuarios.")
 
         # Crear estudio ejemplo
         if self.__db["estudios"].count_documents({}) == 0:
@@ -38,9 +40,11 @@ class ConexionMongo:
                 "ruta_nifti": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosNifti\img1.nii.gz",
                 "fecha_carga":"25/06/2020"
             })
+            m.append("Cargado estudio de prueba.")
 
         # Crear registro_archivos ejemplo
         if self.__db["registro_archivos"].count_documents({}) == 0:
+            m.append("Cargados archivos de ejemplo (csv, mat).")
             self.__db["registro_archivos"].insert_many([
                 {
                     "id": str(uuid.uuid4()),
@@ -57,6 +61,7 @@ class ConexionMongo:
                     "ruta": r"C:/archivos/datos.csv"
                 }
             ])
+        return m
     def reg_acceso(self, usuario, exito):
         self.__db["accesos"].insert_one({
             "usuario": usuario,
