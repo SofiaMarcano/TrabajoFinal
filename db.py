@@ -4,12 +4,12 @@ import datetime
 
 class ConexionMongo:
     def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
-        self._cliente = MongoClient(uri)
-        self._db = self._cliente[db_nombre]
-        self._usuarios = self._db["usuarios"]
+        self.__cliente = MongoClient(uri)
+        self.__db = self._cliente[db_nombre]
+        self.__usuarios = self.__db["usuarios"]
 
     def verf_usu(self, u, p):
-        doc = self._usuarios.find_one({"usuario": u, "password": p})
+        doc = self.__usuarios.find_one({"usuario": u, "password": p})
         if doc:
             return doc.get("tipo_usuario")
         return None
@@ -18,15 +18,15 @@ class ConexionMongo:
         print("Verificando base de datos 🐱...")
 
         # Crear usuarios
-        if self._db["usuarios"].count_documents({}) == 0:
-            self._db["usuarios"].insert_many([
+        if self.__db["usuarios"].count_documents({}) == 0:
+            self.__db["usuarios"].insert_many([
                 {"usuario": "WilliamMora", "password": "12345", "tipo_usuario": "imagen"},
                 {"usuario": "CarmenLucia", "password": "Plumas1", "tipo_usuario": "senal"}
             ])
 
         # Crear estudio ejemplo
-        if self._db["estudios"].count_documents({}) == 0:
-            self._db["estudios"].insert_one({
+        if self.__db["estudios"].count_documents({}) == 0:
+            self.__db["estudios"].insert_one({
                 "paciente": {
                     "id": "PAC001",
                     "nombre": "Elizabeth Gonzales",
@@ -40,8 +40,8 @@ class ConexionMongo:
             })
 
         # Crear registro_archivos ejemplo
-        if self._db["registro_archivos"].count_documents({}) == 0:
-            self._db["registro_archivos"].insert_many([
+        if self.__db["registro_archivos"].count_documents({}) == 0:
+            self.__db["registro_archivos"].insert_many([
                 {
                     "id": str(uuid.uuid4()),
                     "tipo_archivo": "mat",
@@ -58,14 +58,14 @@ class ConexionMongo:
                 }
             ])
     def reg_acceso(self, usuario, exito):
-        self._db["accesos"].insert_one({
+        self.__db["accesos"].insert_one({
             "usuario": usuario,
             "exito": exito,
             "fecha": datetime.now()
         })
     def fallos(self, usuario, minutos=10):
         limite = datetime.now() - datetime.timedelta(minutes=minutos)
-        return self._db["accesos"].count_documents({
+        return self.__db["accesos"].count_documents({
             "usuario": usuario,
             "exito": False,
             "fecha": {"$gte": limite}
