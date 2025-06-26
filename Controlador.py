@@ -22,3 +22,4 @@ class LoginControlador:
             self.panel.show()
         else:
             QMessageBox.critical(self.vista, "Error", "Usuario o contraseña inválidos.")
+            self.vista.clear()
