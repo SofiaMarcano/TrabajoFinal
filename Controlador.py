@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QTimer
 # from Vista import ImagenVista
 # from Vista import SenalVista
 class LoginControlador:
@@ -28,8 +29,10 @@ class LoginControlador:
             self.modelo.reg_acceso(usuario, tipo is not None)
 
             if tipo:
+                self.vista.error(f"✅ Bienvenido, acceso como usuario tipo: {tipo}")
                 self.vista.normal()
-                self.vista.close()
+                QTimer.singleShot(3000, self.vista.close)  # Espera 1.8 segundos antes de cerrar
+
                 # Aquí abrirías la vista correspondiente, por ejemplo:
                 # if tipo == "imagen":
                 #     self.panel = ImagenVista()
