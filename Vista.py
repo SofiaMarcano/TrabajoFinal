@@ -3,12 +3,17 @@ from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt
 
+# vista/login_vista.py
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
+from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
+from PyQt5.QtCore import Qt
+
 class LoginVista(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(" 🐱Sistema Biomédico - Ingreso")
-        self.setGeometry(500, 150, 600, 460)
-        self.setFixedSize(600, 460)
+        self.setGeometry(500, 150, 600, 480)
+        self.setFixedSize(600, 480)
         self.controlador = None
         self.interfaz()
         self.estilo()
@@ -20,28 +25,44 @@ class LoginVista(QWidget):
         return self.controlador
 
     def interfaz(self):
+        # Línea divisoria decorativa
+        self.linea = QFrame()
+        self.linea.setFrameShape(QFrame.HLine)
+        self.linea.setFrameShadow(QFrame.Sunken)
+        self.linea.setStyleSheet("color: #777;")
+
+        # Campo de usuario
         self.label_usuario = QLabel("Usuario:")
         self.input_usuario = QLineEdit()
 
+        # Campo de contraseña
         self.label_password = QLabel("Contraseña:")
         self.input_password = QLineEdit()
         self.input_password.setEchoMode(QLineEdit.Password)
 
+        # CheckBox para mostrar/ocultar contraseña
+        self.checkbox_mostrar = QCheckBox("Mostrar contraseña")
+        self.checkbox_mostrar.stateChanged.connect(self.toggle_password)
+
+        # Etiqueta para errores
         self.label_error = QLabel("")
         self.label_error.setStyleSheet("color: #FF5555; font-weight: bold; font-size: 14px;")
         self.label_error.setAlignment(Qt.AlignCenter)
 
+        # Botón de login
         self.boton_login = QPushButton("Ingresar")
         self.boton_login.setCursor(QCursor(Qt.PointingHandCursor))
 
+        # Layout principal
         layout = QVBoxLayout()
-        layout.setSpacing(15)
+        layout.setSpacing(12)
         layout.setContentsMargins(50, 40, 50, 40)
         layout.addWidget(self.linea)
         layout.addWidget(self.label_usuario)
         layout.addWidget(self.input_usuario)
         layout.addWidget(self.label_password)
         layout.addWidget(self.input_password)
+        layout.addWidget(self.checkbox_mostrar)
         layout.addWidget(self.label_error)
         layout.addStretch(1)
         layout.addWidget(self.boton_login)
@@ -49,6 +70,7 @@ class LoginVista(QWidget):
         self.setLayout(layout)
 
     def estilo(self):
+        # Colores y fuentes personalizados
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor("#1E1E2F"))
         palette.setColor(QPalette.WindowText, QColor("#F0F0F0"))
@@ -66,6 +88,10 @@ class LoginVista(QWidget):
                 padding: 10px;
                 color: #F0F0F0;
                 font-size: 16px;
+            }
+            QCheckBox {
+                color: #CCCCCC;
+                font-size: 13px;
             }
             QPushButton {
                 background-color: #00A8CC;
@@ -86,6 +112,7 @@ class LoginVista(QWidget):
     def clear(self):
         self.input_usuario.clear()
         self.input_password.clear()
+        self.label_error.clear()
 
     def error(self, mensaje):
         self.label_error.setText(mensaje)
@@ -97,3 +124,9 @@ class LoginVista(QWidget):
     def normal(self):
         self.setCursor(QCursor(Qt.ArrowCursor))
 
+    def toggle_password(self, estado):
+        # Cambia entre mostrar y ocultar contraseña
+        if estado == Qt.Checked:
+            self.input_password.setEchoMode(QLineEdit.Normal)
+        else:
+            self.input_password.setEchoMode(QLineEdit.Password)

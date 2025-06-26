@@ -4,6 +4,13 @@ from Vista import LoginVista
 from db import ConexionMongo
 from Modelo import ModeloBase
 from Controlador import LoginControlador
+def rev_num(msj):
+    while True:
+        try:
+            x=int(input(msj))
+            return x
+        except:
+            print("Ingrese un numero entero.")
 
 class AppBioMedica:
     def __init__(self):
@@ -11,13 +18,16 @@ class AppBioMedica:
 
         # Conexión e inicialización de MongoDB
         self.mongo = ConexionMongo()
-        self.mongo.ver_o_create()
+        m = self.mongo.ver_o_create()
 
         # MVC
         self.vista = LoginVista()
+        
         self.modelo = ModeloBase(self.mongo)
         self.controlador = LoginControlador(self.vista, self.modelo)
         self.vista.set_controlador(self.controlador)
+        if m:
+            self.controlador.see_inicio(m)
 
     def ejecute(self):
         self.vista.show()
