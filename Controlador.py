@@ -31,7 +31,7 @@ class LoginControlador:
             if tipo:
                 self.vista.error(f" 🐱Bienvenido, acceso como usuario tipo: {tipo}")
                 self.vista.normal()
-                QTimer.singleShot(3000, self.vista.close)  # Espera 1.8 segundos antes de cerrar
+                QTimer.singleShot(3000, self.vista.close)  # Espera 3 segundos antes de cerrar
 
                 # Aquí abrirías la vista correspondiente, por ejemplo:
                 # if tipo == "imagen":
