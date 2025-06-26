@@ -26,5 +26,4 @@ class AppBioMedica:
 if __name__ == "__main__":
     aplicacion = AppBioMedica()
     aplicacion.ejecute()
-    
 

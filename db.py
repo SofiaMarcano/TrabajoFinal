@@ -34,8 +34,8 @@ class ConexionMongo:
                     "sexo": "Femenino"
                 },
                 "tipo_archivo": "DICOM",
-                "ruta_dicom": "C:/dicoms/Eli/",
-                "ruta_nifti": "C:/dicoms/Eli/vol.nii.gz",
+                "ruta_dicom": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosDICOM\img1",
+                "ruta_nifti": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosNifti\img1.nii.gz",
                 "fecha_carga":"25/06/2020"
             })
 
@@ -47,14 +47,14 @@ class ConexionMongo:
                     "tipo_archivo": "mat",
                     "nombre_archivo": "enfermo",
                     "fecha": "20/06/2021",
-                    "ruta": "C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosMAT\enfermo.mat"
+                    "ruta": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosMAT\enfermo.mat"
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "tipo_archivo": "csv",
                     "nombre_archivo": "datos.csv",
                     "fecha": "20/07/2022",
-                    "ruta": "C:/archivos/datos.csv"
+                    "ruta": r"C:/archivos/datos.csv"
                 }
             ])
     def reg_acceso(self, usuario, exito):
