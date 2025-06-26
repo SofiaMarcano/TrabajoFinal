@@ -47,14 +47,14 @@ class ConexionMongo:
             m.append("Cargados archivos de ejemplo (csv, mat).")
             self.__db["registro_archivos"].insert_many([
                 {
-                    "id": str(uuid.uuid4()),
+                    "id": "ARCH001",
                     "tipo_archivo": "mat",
                     "nombre_archivo": "enfermo",
                     "fecha": "20/06/2021",
                     "ruta": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosMAT\enfermo.mat"
                 },
                 {
-                    "id": str(uuid.uuid4()),
+                    "id": ARCH002
                     "tipo_archivo": "csv",
                     "nombre_archivo": "datos.csv",
                     "fecha": "20/07/2022",
