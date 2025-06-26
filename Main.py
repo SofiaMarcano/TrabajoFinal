@@ -1,11 +1,16 @@
+import sys
 from PyQt5.QtWidgets import QApplication
 from Vista import LoginVista
-
-import sys
-
+from db import ConexionMongo
 class AppBioMedica:
     def __init__(self):
         self.app = QApplication(sys.argv)
+
+        # Conexión e inicialización de MongoDB
+        self.mongo = ConexionMongo()
+        self.mongo.ver_o_create()
+
+        # MVC
         self.vista = LoginVista()
 
     def ejecute(self):
@@ -15,3 +20,4 @@ class AppBioMedica:
 if __name__ == "__main__":
     aplicacion = AppBioMedica()
     aplicacion.ejecute()
+
