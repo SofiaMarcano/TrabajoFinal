@@ -33,7 +33,7 @@ class LoginControlador:
                 self.vista.normal()
                 QTimer.singleShot(3000, self.vista.close)  # Espera 3 segundos antes de cerrar
 
-                # Aquí abrirías la vista correspondiente, por ejemplo:
+                # Aquí abrirías la vista 
                 # if tipo == "imagen":
                 #     self.panel = ImagenVista()
                 # else:
