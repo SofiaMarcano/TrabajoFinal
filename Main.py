@@ -4,6 +4,13 @@ from Vista import LoginVista
 from db import ConexionMongo
 from Modelo import ModeloBase
 from Controlador import LoginControlador
+def rev_num(msj):
+    while True:
+        try:
+            x=int(input(msj))
+            return x
+        except:
+            print("Ingrese un numero entero.")
 
 class AppBioMedica:
     def __init__(self):
