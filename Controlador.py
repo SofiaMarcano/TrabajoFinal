@@ -20,7 +20,7 @@ class LoginControlador:
 
             if not usuario or not password:
                 self.vista.error("Por favor, ingrese usuario y contraseña.")
-                self.mostrar_easteregg_temporal()
+                self.cositas()
                 return
 
             fallos = self.modelo.fallos(usuario)
@@ -60,7 +60,7 @@ class LoginControlador:
             QTimer.singleShot(delay, lambda m=msg: self.vista.error(m))
             delay += 2000
         QTimer.singleShot(delay, lambda: (self.vista.clear(), self.vista.error(""))) 
-    def mostrar_easteregg_temporal(self):
+    def cositas(self):
         self.easteregg_window = QWidget()
         self.easteregg_window.setWindowTitle("Ingresa bien!!!")
         self.easteregg_window.setGeometry(600, 250, 550, 440)
@@ -139,7 +139,7 @@ class LoginControlador:
         # Reabrir login
         QTimer.singleShot(4000, self.reabrir_login)
 
-    def cambiar_color_texto(self):
+    def cambiar_color(self):
         color = self.colores[self.color_index]
         estilo = f"""
             color: {color};
