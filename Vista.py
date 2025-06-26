@@ -12,7 +12,6 @@ class LoginVista(QWidget):
         self.controlador = None
     def set_controlador(self, controlador):
         self.controlador = controlador
-
     def get_controlador(self):
         return self.controlador
 
@@ -32,8 +31,6 @@ class LoginVista(QWidget):
         layout.addWidget(self.input_usuario)
         layout.addWidget(self.label_password)
         layout.addWidget(self.input_password)
-        layout.addWidget(self.label_tipo)
-        layout.addWidget(self.combo_tipo)
         layout.addWidget(self.boton_login)
 
         self.setLayout(layout)
