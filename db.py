@@ -5,7 +5,7 @@ import datetime
 class ConexionMongo:
     def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
         self.__cliente = MongoClient(uri)
-        self.__db = self._cliente[db_nombre]
+        self.__db = self.__cliente[db_nombre]
         self.__usuarios = self.__db["usuarios"]
 
     def verf_usu(self, u, p):
@@ -61,10 +61,10 @@ class ConexionMongo:
         self.__db["accesos"].insert_one({
             "usuario": usuario,
             "exito": exito,
-            "fecha": datetime.now()
+            "fecha": datetime.datetime.now()
         })
     def fallos(self, usuario, minutos=10):
-        limite = datetime.now() - datetime.timedelta(minutes=minutos)
+        limite = datetime.datetime.now() - datetime.timedelta(minutes=minutos)
         return self.__db["accesos"].count_documents({
             "usuario": usuario,
             "exito": False,
