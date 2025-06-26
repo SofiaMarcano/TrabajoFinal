@@ -3,4 +3,4 @@ class ModeloBase:
         self._conexion = conexion_mongo
 
     def validar_usuario(self, usuario, password):
-        return self._conexion.verificar_credenciales(usuario, password)
+        return self._conexion.ver_usu(usuario, password)
