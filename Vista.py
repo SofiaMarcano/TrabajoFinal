@@ -112,6 +112,7 @@ class LoginVista(QWidget):
     def clear(self):
         self.input_usuario.clear()
         self.input_password.clear()
+        self.label_error.clear()
 
     def error(self, mensaje):
         self.label_error.setText(mensaje)

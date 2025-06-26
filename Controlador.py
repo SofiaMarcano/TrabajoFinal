@@ -54,3 +54,4 @@ class LoginControlador:
         for msg in mensajes:
             QTimer.singleShot(delay, lambda m=msg: self.vista.error(m))
             delay += 2000
+        QTimer.singleShot(delay, lambda: (self.vista.clear(), self.vista.error(""))) 
