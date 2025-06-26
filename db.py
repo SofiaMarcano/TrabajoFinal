@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import uuid
+import datetime
 
 class ConexionMongo:
     def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
@@ -56,3 +57,16 @@ class ConexionMongo:
                     "ruta": "C:/archivos/datos.csv"
                 }
             ])
+    def reg_acceso(self, usuario, exito):
+        self._db["accesos"].insert_one({
+            "usuario": usuario,
+            "exito": exito,
+            "fecha": datetime.now()
+        })
+    def fallos(self, usuario, minutos=10):
+        limite = datetime.now() - datetime.timedelta(minutes=minutos)
+        return self._db["accesos"].count_documents({
+            "usuario": usuario,
+            "exito": False,
+            "fecha": {"$gte": limite}
+        })
