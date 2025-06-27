@@ -22,7 +22,6 @@ class AppBioMedica:
 
         # MVC
         self.vista = LoginVista()
-        
         self.modelo = ModeloBase(self.mongo)
         self.controlador = LoginControlador(self.vista, self.modelo)
         self.vista.set_controlador(self.controlador)

@@ -35,8 +35,8 @@ class ConexionMongo:
                     "sexo": "Femenino"
                 },
                 "tipo_archivo": "DICOM",
-                "ruta_dicom": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosDICOM\img1",
-                "ruta_nifti": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosNifti\img1.nii.gz",
+                "ruta_dicom": r"archivosDICOM\img1",
+                "ruta_nifti": r"archivosNIFTI\img1.nii.gz",
                 "fecha_carga":"25/06/2020"
             })
             m.append("Cargado estudio de prueba.")
