@@ -50,7 +50,7 @@ class ConexionMongo:
                     "tipo_archivo": "mat",
                     "nombre_archivo": "enfermo",
                     "fecha": "20/06/2021",
-                    "ruta": r"C:\Users\ADMIN\OneDrive\Tercer semestre\Informatica II\TrabajoFinal\archivosMAT\enfermo.mat"
+                    "ruta": r"archivosMAT\enfermo.mat"
                 },
                 {
                     "id": "ARCH002",

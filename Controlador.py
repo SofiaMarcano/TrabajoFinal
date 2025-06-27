@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 
 # from Vista import ImagenVista
-# from Vista import SenalVista
+from Vista import SenalVista
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
@@ -39,11 +39,12 @@ class LoginControlador:
                 QTimer.singleShot(3000, self.vista.close)  # Espera 3 segundos antes de cerrar
 
                 # Aquí abrirías la vista 
-                # if tipo == "imagen":
-                #     self.panel = ImagenVista()
-                # else:
-                #     self.panel = SenalVista()
-                # self.panel.show()
+                if tipo == "imagen":
+                    # self.panel = ImagenVista()
+                    pass
+                else:
+                    self.panel = SenalVista()
+                self.panel.show()
             else:
                 self.vista.error(f"Usuario o contraseña incorrectos.\nIntentos fallidos recientes: {fallos}/5")
                 self.vista.clear()
@@ -157,3 +158,5 @@ class LoginControlador:
         self.easteregg_window.close()
         self.vista.clear()
         self.vista.show()
+
+

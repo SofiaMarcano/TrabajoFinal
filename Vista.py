@@ -130,3 +130,6 @@ class LoginVista(QWidget):
             self.input_password.setEchoMode(QLineEdit.Normal)
         else:
             self.input_password.setEchoMode(QLineEdit.Password)
+
+
+# class SenalVista()
