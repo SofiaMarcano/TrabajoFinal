@@ -168,12 +168,6 @@ class elegirSenalVentana(QMainWindow):
     def setup(self):
         self.abriSenal.clicked.connect(self.cargarSenal)
 
-    def elegirArchivo(self):
-        vistaElegirSenal = ElegirLlave(self)
-        vistaElegirSenal.asignarControlador(self.__controlador)
-        self.close()
-        vistaElegirSenal.show()
-        
     def asignarControlador(self,c):
         self.__controlador = c
 
@@ -181,6 +175,10 @@ class elegirSenalVentana(QMainWindow):
         archivo, _ = QFileDialog.getOpenFileName(self, "Abrir señal","","Archivos mat (*.mat)")
         if archivo !='':
             print(archivo)
+            vistaElegirSenal = ElegirLlave(self)
+            vistaElegirSenal.asignarControlador(self.__controlador)
+            self.close()
+            vistaElegirSenal.show()
         else:
             self.seleccionetexto.setText("Señal no válida")
             self.seleccionetexto.repaint()
