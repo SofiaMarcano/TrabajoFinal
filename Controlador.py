@@ -41,7 +41,6 @@ class LoginControlador:
             else:
                 self.vista.error(f"Usuario o contraseña incorrectos.\nIntentos fallidos recientes: {fallos}/5")
                 self.vista.clear()
-
         except Exception as e:
             self.vista.error(f"Error: {str(e)}")
 

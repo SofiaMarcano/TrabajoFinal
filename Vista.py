@@ -1,7 +1,7 @@
-# vista/login_vista.py
+
 from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
 from Imagenes import bgPrueba_rc
 
@@ -114,12 +114,12 @@ class LoginVista(QWidget):
     def clear(self):
         self.input_usuario.clear()
         self.input_password.clear()
-        self.label_error.clear()
 
     def error(self, mensaje):
         self.label_error.setText(mensaje)
-        self.label_error.repaint()
-
+        self.label_error.setStyleSheet("color: red; font-weight: bold;")
+        self.label_error.setVisible(True)
+        QTimer.singleShot(4000, lambda: self.label_error.clear())
     def espera(self):
         self.setCursor(QCursor(Qt.WaitCursor))
 
