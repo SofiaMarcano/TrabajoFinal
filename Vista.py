@@ -1,12 +1,14 @@
 # vista/login_vista.py
-from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame
+from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt
+from PyQt5.uic import loadUi
+from Imagenes import bgPrueba_rc
 
 # vista/login_vista.py
-from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
-from PyQt5.QtCore import Qt
+# from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
+# from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
+# from PyQt5.QtCore import Qt
 
 class LoginVista(QWidget):
     def __init__(self):
@@ -132,4 +134,58 @@ class LoginVista(QWidget):
             self.input_password.setEchoMode(QLineEdit.Password)
 
 
-# class SenalVista()
+class senales_tabla_menu_Vista(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        loadUi("senalesVentana.ui",self)
+        self.setup()
+
+    def setup(self):
+        self.senalesBoton.clicked.connect(self.elegirSenalVista)
+        # self.tabularesBoton.clicked.connect(self.elegirTablaVista)
+
+    def elegirSenalVista(self):
+        vistaElegirSenal = elegirSenalVentana(self)
+        vistaElegirSenal.asignarControlador(self.__controlador)
+        self.close()
+        vistaElegirSenal.show()
+
+    # def elegirTablaVista(self):
+    #     vistaElegirTabla = elegirTablaVentana(self)
+    #     vistaElegirTabla.asignarControlador(self.__controlador)
+    #     self.close()
+    #     vistaElegirTabla.show()
+        
+    def asignarControlador(self,c):
+        self.__controlador = c
+
+class elegirSenalVentana(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        loadUi("elegirSenalVentana.ui",self)
+        self.setup()
+
+    def setup(self):
+        self.abriSenal.clicked.connect(self.cargarSenal)
+
+    def elegirArchivo(self):
+        vistaElegirSenal = ElegirLlave(self)
+        vistaElegirSenal.asignarControlador(self.__controlador)
+        self.close()
+        vistaElegirSenal.show()
+        
+    def asignarControlador(self,c):
+        self.__controlador = c
+
+    def cargarSenal(self):
+        archivo, _ = QFileDialog.getOpenFileName(self, "Abrir señal","","Archivos mat (*.mat)")
+        if archivo !='':
+            print(archivo)
+        else:
+            self.seleccionetexto.setText("Señal no válida")
+            self.seleccionetexto.repaint()
+
+            
+
+class ElegirLlave(QMainWindow):
+    pass

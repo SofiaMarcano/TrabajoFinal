@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 
 # from Vista import ImagenVista
-from Vista import SenalVista
+from Vista import senales_tabla_menu_Vista
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
@@ -36,15 +36,8 @@ class LoginControlador:
             if tipo:
                 self.vista.error(f" 🐱Bienvenido, acceso como usuario tipo: {tipo}")
                 self.vista.normal()
-                QTimer.singleShot(3000, self.vista.close)  # Espera 3 segundos antes de cerrar
+                QTimer.singleShot(3000, lambda: self.abrirVista(tipo))  # Espera 3 segundos antes de cerrar
 
-                # Aquí abrirías la vista 
-                if tipo == "imagen":
-                    # self.panel = ImagenVista()
-                    pass
-                else:
-                    self.panel = SenalVista()
-                self.panel.show()
             else:
                 self.vista.error(f"Usuario o contraseña incorrectos.\nIntentos fallidos recientes: {fallos}/5")
                 self.vista.clear()
@@ -54,6 +47,16 @@ class LoginControlador:
 
         finally:
             self.vista.normal()
+    def abrirVista(self,tipo):
+        self.vista.close()
+        if tipo == "imagen":
+            # self.panel = ImagenVista()
+            pass
+        else:
+            self.panel = senales_tabla_menu_Vista()
+        self.panel.show()
+        self.panel.asignarControlador(self)
+
     def see_inicio(self, mensajes):
         # Mostrar mensajes de inicio como la creación de base de datos con tiempo
         delay = 1000
