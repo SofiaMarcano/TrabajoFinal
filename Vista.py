@@ -1,9 +1,11 @@
 
-from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog, QMessageBox, QSizePolicy
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
 from Imagenes import bgPrueba_rc
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 # vista/login_vista.py
 # from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
@@ -206,13 +208,98 @@ class ElegirLlave(QMainWindow):
         llave = self.comboBox.currentText()
         respuesta = self.__controlador.verificarLlave(llave)
         if respuesta == "OK":
-            pass
+            vistaSenal = senalVista(self)
+            vistaSenal.asignarControlador(self.__controlador)
+            self.close()
+            vistaSenal.show()
         else:
-            QMessageBox.warning(self, "Error", f"La llave '{llave}' no es un arreglo.\nPor favor, intenta con otra.")
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"La llave '{llave}' no es un arreglo.\nPor favor, intenta con otra.")
+            msg.setIcon(QMessageBox.Warning)
 
+            # Aplica estilos
+            msg.setStyleSheet("""
+                QMessageBox {
+                    background-color: white;
+                    font-size: 14pt;
+                    border-radius: 10px;
+                }
+                QMessageBox QLabel {
+                    background-color: white;
+                }
 
+                QPushButton {
+                    background-color: #2980B9;
+                    color: white;
+                    border-radius: 8px;
+                    padding: 6px 12px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: #3498DB;
+                }
+            """)
+
+            msg.exec_()
 
     def asignarControlador(self,c):
         self.__controlador = c
 
-    
+
+class MyGraphCanvas(FigureCanvas):
+    def __init__(self, parent = None, width=6, height=5, dpi=100):
+        self.fig = Figure(figsize=(width,height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        FigureCanvas.__init__(self,self.fig)
+        self.setParent(parent)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.updateGeometry()
+
+    def graficar(self, datos):
+        self.axes.clear()
+        for c in range(datos.shape[0]):
+            self.axes.plot(datos[c,:] + c*10)
+
+        self.axes.set_xlabel('Muestras')
+        self.axes.set_ylabel('Voltaje (uV)')
+        self.axes.set_title('Señales EEG')
+        self.fig.patch.set_facecolor('none')
+        self.fig.tight_layout()
+        self.draw() 
+
+    # def graficaProm(self,datos):
+    #     self.ax2 = self.fig.add_subplot(212)
+    #     self.ax2.stem(datos)
+    #     self.ax2.set_xlabel('Muestras')
+    #     self.ax2.set_ylabel('Voltaje (uV)')
+    #     self.ax2.set_title('Señales EEG')
+    #     self.draw()  
+
+class senalVista(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        loadUi("archivosUI/senales.ui",self)
+        self.setup()
+
+    def setup(self):
+        self.layout = QVBoxLayout()
+        self.senalPpal.setLayout(self.layout)
+        self.sc = MyGraphCanvas(self.senalPpal, width=2, height=2, dpi=60)
+        self.layout.addWidget(self.sc)
+
+        self.volverBoton.clicked.connect(self.volverMenu)
+        self.canalesBoton.clicked.connect(self.numCanales)
+        self.segmentarBoton.clicked.connect(self.segmentar)
+        self.estBoton.clicked.connect(self.est)
+        self.filtradoBoton.clicked.connect(self.filtrar)
+        self.boxBoton.clicked.connect(self.boxplotear)
+        self.picosBoton.clicked.connect(self.picos)
+        self.histBoton.clicked.connect(self.histogramar)
+        self.adelante.clicked.connect(self.adelantar)
+        self.atras.clicked.connect(self.atrasar)
+        self.guardar.clicked.connect(self.guardar)
+
+    def asignarControlador(self,c):
+        self.__controlador = c
+

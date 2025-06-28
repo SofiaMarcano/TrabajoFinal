@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>756</width>
+    <height>470</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#centralwidget {
+    border-image: url(&quot;:/1/tv.png&quot;) 0 0 0 0 stretch stretch;
+	background-color: transparent;
+}
+</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">background-color: transparent;</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>68</x>
+      <y>57</y>
+      <width>499</width>
+      <height>358</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetFixedSize</enum>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayoutCanvasPPal">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
+         <item>
+          <widget class="QWidget" name="senalPpal" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>420</width>
+             <height>190</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>190</height>
+            </size>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+            <widget class="QLabel" name="label_2">
+             <property name="minimumSize">
+              <size>
+               <width>59</width>
+               <height>45</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+
+	font: 2pt &quot;Times New Roman&quot;;
+    font-size: 15pt;
+    color: black;
+}
+</string>
+             </property>
+             <property name="text">
+              <string># de 
+canales</string>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+            <widget class="QSpinBox" name="spinBox">
+             <property name="minimumSize">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+            <widget class="QPushButton" name="canalesBoton">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 8pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+             </property>
+             <property name="text">
+              <string>OK</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QWidget" name="graficoEst" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>244</width>
+               <height>146</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(255, 255, 255);</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QScrollArea" name="scrollArea">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>174</width>
+               <height>152</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>152</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOn</enum>
+             </property>
+             <property name="widgetResizable">
+              <bool>false</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents_2">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>-49</y>
+                <width>155</width>
+                <height>242</height>
+               </rect>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetFixedSize</enum>
+               </property>
+               <item>
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="3" column="0">
+                  <widget class="QPushButton" name="boxBoton">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Boxplot resumen</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QPushButton" name="estBoton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>121</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Estadísticas</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QPushButton" name="filtradoBoton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>121</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Filtrado</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QPushButton" name="promedioBoton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>121</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Promedio</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QPushButton" name="picosBoton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>121</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Detección de picos</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="5" column="0">
+                  <widget class="QPushButton" name="histBoton">
+                   <property name="minimumSize">
+                    <size>
+                     <width>135</width>
+                     <height>32</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Histograma épocas</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter|Qt::AlignTop">
+            <widget class="QLabel" name="estTexto">
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+
+	font: 2pt &quot;Times New Roman&quot;;
+    font-size: 10pt;
+    color: black;
+}
+</string>
+             </property>
+             <property name="text">
+              <string>Estadísicas:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_8"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>609</x>
+      <y>30</y>
+      <width>131</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+
+	font: 2pt &quot;Times New Roman&quot;;
+    font-size: 15pt;
+    color: white;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Mínimo</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="min">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+
+	font: 2pt &quot;Times New Roman&quot;;
+    font-size: 15pt;
+    color: white;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Máximo</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="max">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(255, 255, 255);</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="segmentarBoton">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+       </property>
+       <property name="text">
+        <string>Segmentar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>653</x>
+      <y>250</y>
+      <width>91</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+      <widget class="QPushButton" name="adelante">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: black;
+    color: white;
+    border: 2px solid black;
+    border-radius: 25px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    font-size: 18px;
+}
+
+
+QPushButton:hover {
+    border-color:  rgb(81, 81, 81);
+	background-color: rgb(81, 81, 81);
+}
+
+QPushButton:pressed {
+    background-color: white
+    border-color: white
+    color: black
+}
+</string>
+       </property>
+       <property name="text">
+        <string>→</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+      <widget class="QPushButton" name="atras">
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: black;
+    color: white;
+    border: 2px solid black;
+    border-radius: 25px;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 50px;
+    max-height: 50px;
+    font-size: 18px;
+}
+
+
+QPushButton:hover {
+    border-color:  rgb(81, 81, 81);
+	background-color: rgb(81, 81, 81);
+}
+
+QPushButton:pressed {
+    background-color: white
+    border-color: white
+    color: black
+}
+</string>
+       </property>
+       <property name="text">
+        <string>←</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>421</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
+      <widget class="QPushButton" name="volverBoton">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 10px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+       </property>
+       <property name="text">
+        <string>VOLVER</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+
+	font: 2pt &quot;Times New Roman&quot;;
+    font-size: 15pt;
+    color: white;
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Canales: 0, muestas: 0, épocas: 0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="guardar">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>410</y>
+      <width>129</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+    </property>
+    <property name="text">
+     <string>Guardar Imagen</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../Imagenes/bgPrueba.qrc"/>
+  <include location="../fuentes/fuentes.qrc"/>
+ </resources>
+ <connections/>
+</ui>

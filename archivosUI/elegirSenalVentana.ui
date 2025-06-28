@@ -166,17 +166,102 @@ QPushButton:pressed {
         </spacer>
        </item>
        <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+          <widget class="QLabel" name="seleccionetexto_2">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>37</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel {
+
+	font: 8pt &quot;Times New Roman&quot;;
+    font-size: 15pt;
+    color: black;
+}
+</string>
+           </property>
+           <property name="text">
+            <string>O desde la base de datos:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+          <widget class="QPushButton" name="cargarMAT">
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 12pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}
+</string>
+           </property>
+           <property name="text">
+            <string>Cargar...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -185,7 +270,7 @@ QPushButton:pressed {
   </widget>
  </widget>
  <resources>
-  <include location="Imagenes/bgPrueba.qrc"/>
+  <include location="../Imagenes/bgPrueba.qrc"/>
   <include location="fuentes/fuentes.qrc"/>
  </resources>
  <connections/>
