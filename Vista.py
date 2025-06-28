@@ -175,14 +175,13 @@ class elegirSenalVentana(QMainWindow):
         archivo, _ = QFileDialog.getOpenFileName(self, "Abrir señal","","Archivos mat (*.mat)")
         if archivo !='':
             self.__controlador.recibirRuta(archivo)
-            self.__llaves = self.__controlador.dLlaves()
-            print(self.__llaves)
-            # vistaElegirSenal = ElegirLlave(self)
-            # vistaElegirSenal.asignarControlador(self.__controlador)
-            # self.close()
-            # vistaElegirSenal.show()
+            vistaElegirSenal = ElegirLlave(self)
+            vistaElegirSenal.asignarControlador(self.__controlador)
+            vistaElegirSenal.listarLlaves()
+            self.close()
+            vistaElegirSenal.show()
         else:
-            self.seleccionetexto.setText("Señal no válida")
+            self.seleccionetexto.setText("Archivo no válido")
             self.seleccionetexto.repaint()
 
             
@@ -190,11 +189,19 @@ class elegirSenalVentana(QMainWindow):
 class ElegirLlave(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        loadUi("archivosUI/llaveVentana.ui",self)
+        loadUi("archivosUI/elegirLlaveVentana.ui",self)
         self.setup()
 
-    # def setup(self):
-    #     self.abriSenal.clicked.connect(self.cargarSenal)
+    def setup(self):
+        self.continuarLlave.clicked.connect(self.verificarLlave)
+        pass
+    
+    def listarLlaves(self):
+        self.__llaves = self.__controlador.dLlaves()
+        self.comboBox.addItems(list(self.__llaves))
+        print(self.__llaves)
 
     def asignarControlador(self,c):
         self.__controlador = c
+
+    
