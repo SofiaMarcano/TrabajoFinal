@@ -300,7 +300,7 @@ class senalVista(QMainWindow):
     def setup(self):
         self.layout = QVBoxLayout()
         self.senalPpal.setLayout(self.layout)
-        self.sc = MyGraphCanvas(self.senalPpal, width=2, height=2, dpi=60)
+        self.sc = MyGraphCanvas(self.senalPpal, width=5, height=4.5, dpi=60)
         self.layout.addWidget(self.sc)
         
 
@@ -331,6 +331,10 @@ class senalVista(QMainWindow):
         self.x_max = 2000
 
         self.sc.graficar(self.__controlador.devolverDatosSenal(self.x_min, self.x_max))
+        self.shapeTexto.setText(f"Canales: {str(c)}, muestas: {str(m)}, épocas: {str(e)}")
+        self.shapeTexto.repaint()
+        self.spinBox.setValue(c)
+
 
     def volverMenu(self):
         self.close()

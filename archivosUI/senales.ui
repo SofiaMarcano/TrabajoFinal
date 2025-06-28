@@ -226,7 +226,7 @@ QPushButton:pressed {
               <property name="geometry">
                <rect>
                 <x>0</x>
-                <y>-49</y>
+                <y>0</y>
                 <width>155</width>
                 <height>242</height>
                </rect>
@@ -698,7 +698,7 @@ QPushButton:pressed {
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="shapeTexto">
        <property name="styleSheet">
         <string notr="true">QLabel {
 
