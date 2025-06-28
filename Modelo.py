@@ -27,3 +27,16 @@ class ModeloBase:
             return "OK"
         else:
             return "Clave no válida"
+    
+    def devolverData(self):
+        return self.__archivo
+    
+    def recibirDatos(self,datos):
+        self.data = datos
+        self.canales = datos.shape[0]
+        self.muestras = datos.shape[1]
+
+    def devolverSegmento(self, x_min, x_max):
+        if x_min >= x_max:
+            return None
+        return self.data[:,x_min:x_max]

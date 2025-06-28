@@ -52,7 +52,7 @@ class LoginControlador:
             # self.panel = ImagenVista()
             pass
         else:
-            self.panel = senales_tabla_menu_Vista()
+            self.panel = senales_tabla_menu_Vista(self.vista)
         self.panel.show()
         self.panel.asignarControlador(self)
 
@@ -172,5 +172,14 @@ class LoginControlador:
     
     def verificarLlave(self,llave):
         return self.modelo.verLlave(llave)
+    
+    def dDatos(self):
+        return self.modelo.devolverData()
+    
+    def rDatos(self,d):
+        self.modelo.recibirDatos(d)
+
+    def devolverDatosSenal(self,min,max):
+        return self.modelo.devolverSegmento(min, max)
 
 

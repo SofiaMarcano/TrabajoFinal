@@ -1,4 +1,4 @@
-
+import numpy as np
 from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog, QMessageBox, QSizePolicy
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt,QTimer
@@ -137,13 +137,15 @@ class LoginVista(QWidget):
 
 
 class senales_tabla_menu_Vista(QMainWindow):
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
+        self.parent = parent
         loadUi("archivosUI/senalesVentana.ui",self)
         self.setup()
 
     def setup(self):
         self.senalesBoton.clicked.connect(self.elegirSenalVista)
+        self.volverBoton.clicked.connect(self.volverMenu)
         # self.tabularesBoton.clicked.connect(self.elegirTablaVista)
 
     def elegirSenalVista(self):
@@ -161,14 +163,20 @@ class senales_tabla_menu_Vista(QMainWindow):
     def asignarControlador(self,c):
         self.__controlador = c
 
+    def volverMenu(self):
+        self.close()
+        self.parent.show()
+
 class elegirSenalVentana(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.parent = parent
         loadUi("archivosUI/elegirSenalVentana.ui",self)
         self.setup()
 
     def setup(self):
         self.abriSenal.clicked.connect(self.cargarSenal)
+        self.volverBoton.clicked.connect(self.volverMenu)
 
     def asignarControlador(self,c):
         self.__controlador = c
@@ -185,18 +193,21 @@ class elegirSenalVentana(QMainWindow):
         else:
             self.seleccionetexto.setText("Archivo no válido")
             self.seleccionetexto.repaint()
-
+    def volverMenu(self):
+        self.close()
+        self.parent.show()
             
 
 class ElegirLlave(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.parent = parent
         loadUi("archivosUI/elegirLlaveVentana.ui",self)
         self.setup()
 
     def setup(self):
         self.continuarLlave.clicked.connect(self.verificar)
-        pass
+        self.volverBoton.clicked.connect(self.volverMenu)
     
     def listarLlaves(self):
         self.__llaves = self.__controlador.dLlaves()
@@ -210,6 +221,7 @@ class ElegirLlave(QMainWindow):
         if respuesta == "OK":
             vistaSenal = senalVista(self)
             vistaSenal.asignarControlador(self.__controlador)
+            vistaSenal.cargarDatos(llave)
             self.close()
             vistaSenal.show()
         else:
@@ -245,14 +257,16 @@ class ElegirLlave(QMainWindow):
 
     def asignarControlador(self,c):
         self.__controlador = c
-
+    def volverMenu(self):
+        self.close()
+        self.parent.show()
 
 class MyGraphCanvas(FigureCanvas):
     def __init__(self, parent = None, width=6, height=5, dpi=100):
         self.fig = Figure(figsize=(width,height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         FigureCanvas.__init__(self,self.fig)
-        self.setParent(parent)
+        self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.updateGeometry()
 
@@ -280,6 +294,7 @@ class senalVista(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         loadUi("archivosUI/senales.ui",self)
+        self.parent = parent
         self.setup()
 
     def setup(self):
@@ -287,19 +302,39 @@ class senalVista(QMainWindow):
         self.senalPpal.setLayout(self.layout)
         self.sc = MyGraphCanvas(self.senalPpal, width=2, height=2, dpi=60)
         self.layout.addWidget(self.sc)
+        
 
         self.volverBoton.clicked.connect(self.volverMenu)
-        self.canalesBoton.clicked.connect(self.numCanales)
-        self.segmentarBoton.clicked.connect(self.segmentar)
-        self.estBoton.clicked.connect(self.est)
-        self.filtradoBoton.clicked.connect(self.filtrar)
-        self.boxBoton.clicked.connect(self.boxplotear)
-        self.picosBoton.clicked.connect(self.picos)
-        self.histBoton.clicked.connect(self.histogramar)
-        self.adelante.clicked.connect(self.adelantar)
-        self.atras.clicked.connect(self.atrasar)
-        self.guardar.clicked.connect(self.guardar)
+        # self.canalesBoton.clicked.connect(self.numCanales)
+        # self.segmentarBoton.clicked.connect(self.segmentar)
+        # self.estBoton.clicked.connect(self.est)
+        # self.filtradoBoton.clicked.connect(self.filtrar)
+        # self.boxBoton.clicked.connect(self.boxplotear)
+        # self.picosBoton.clicked.connect(self.picos)
+        # self.histBoton.clicked.connect(self.histogramar)
+        # self.adelante.clicked.connect(self.adelantar)
+        # self.atras.clicked.connect(self.atrasar)
+        # self.guardar.clicked.connect(self.guardar)
 
     def asignarControlador(self,c):
         self.__controlador = c
+
+
+    def cargarDatos(self,llave):
+        self.__arch = self.__controlador.dDatos()
+        data = self.__arch[llave]
+        c, m, e = data.shape
+        continua = np.reshape(data,(c,m*e), order = "F")
+        self.__controlador.rDatos(continua)
+
+        self.x_min = 0
+        self.x_max = 2000
+
+        self.sc.graficar(self.__controlador.devolverDatosSenal(self.x_min, self.x_max))
+
+    def volverMenu(self):
+        self.close()
+        self.parent.show()
+
+
 

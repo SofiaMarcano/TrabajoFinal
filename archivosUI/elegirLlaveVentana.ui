@@ -183,6 +183,47 @@ QPushButton:pressed {
      </item>
     </layout>
    </widget>
+   <widget class="QPushButton" name="volverBoton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>100</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>100</width>
+      <height>32</height>
+     </size>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 7px 10px;
+    font-size: 10pt;
+}
+
+QPushButton:hover {
+    background-color: #ecf0f1; 
+    border-color: #34495e;
+    color: #34495e;
+}
+
+QPushButton:pressed {
+    background-color: #bdc3c7; 
+    border-color: #2c3e50;
+    color: #2c3e50;
+}</string>
+    </property>
+    <property name="text">
+     <string>VOLVER</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources>
