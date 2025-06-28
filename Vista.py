@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog
+from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog, QMessageBox
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
@@ -208,8 +208,8 @@ class ElegirLlave(QMainWindow):
         if respuesta == "OK":
             pass
         else:
-            self.seleccionetexto.setText(respuesta)
-            self.seleccionetexto.repaint()
+            QMessageBox.warning(self, "Error", f"La llave '{llave}' no es un arreglo.\nPor favor, intenta con otra.")
+
 
 
     def asignarControlador(self,c):
