@@ -137,7 +137,7 @@ class LoginVista(QWidget):
 class senales_tabla_menu_Vista(QMainWindow):
     def __init__(self):
         super().__init__()
-        loadUi("archivosUI\senalesVentana.ui",self)
+        loadUi("archivosUI/senalesVentana.ui",self)
         self.setup()
 
     def setup(self):
@@ -162,7 +162,7 @@ class senales_tabla_menu_Vista(QMainWindow):
 class elegirSenalVentana(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        loadUi("archivosUI\elegirSenalVentana.ui.ui",self)
+        loadUi("archivosUI/elegirSenalVentana.ui",self)
         self.setup()
 
     def setup(self):
@@ -174,11 +174,13 @@ class elegirSenalVentana(QMainWindow):
     def cargarSenal(self):
         archivo, _ = QFileDialog.getOpenFileName(self, "Abrir señal","","Archivos mat (*.mat)")
         if archivo !='':
-            print(archivo)
-            vistaElegirSenal = ElegirLlave(self)
-            vistaElegirSenal.asignarControlador(self.__controlador)
-            self.close()
-            vistaElegirSenal.show()
+            self.__controlador.recibirRuta(archivo)
+            self.__llaves = self.__controlador.dLlaves()
+            print(self.__llaves)
+            # vistaElegirSenal = ElegirLlave(self)
+            # vistaElegirSenal.asignarControlador(self.__controlador)
+            # self.close()
+            # vistaElegirSenal.show()
         else:
             self.seleccionetexto.setText("Señal no válida")
             self.seleccionetexto.repaint()
@@ -186,4 +188,13 @@ class elegirSenalVentana(QMainWindow):
             
 
 class ElegirLlave(QMainWindow):
-    pass
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        loadUi("archivosUI/llaveVentana.ui",self)
+        self.setup()
+
+    # def setup(self):
+    #     self.abriSenal.clicked.connect(self.cargarSenal)
+
+    def asignarControlador(self,c):
+        self.__controlador = c

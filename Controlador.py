@@ -162,3 +162,12 @@ class LoginControlador:
         self.vista.show()
 
 
+    ############MAT############
+
+    def recibirRuta(self,ruta):
+        self.modelo.recibirRuta(ruta)
+    
+    def dLlaves(self):
+        return self.modelo.devolverLlaves()
+
+
