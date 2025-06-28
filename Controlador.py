@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLay
 from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
+import pandas as pd
 
 # from Vista import ImagenVista
 from Vista import senales_tabla_menu_Vista
@@ -51,10 +52,10 @@ class LoginControlador:
         if tipo == "imagen":
             # self.panel = ImagenVista()
             pass
-        else:
+        elif tipo == "senal":
             self.panel = senales_tabla_menu_Vista(self.vista)
-        self.panel.show()
-        self.panel.asignarControlador(self)
+            self.panel.setControlador(self)
+            self.panel.show()
 
     def see_inicio(self, mensajes):
         # Mostrar mensajes de inicio como la creación de base de datos con tiempo
@@ -181,5 +182,24 @@ class LoginControlador:
 
     def devolverDatosSenal(self,min,max):
         return self.modelo.devolverSegmento(min, max)
+    def procesarCSV(self, ruta):
+        df = pd.read_csv(ruta)
+        self._datos_csv = df.values
+        self._datos_csv_columns = list(df.columns)
+        return "OK"
+
+    def obtenerDatosCSV(self):
+        return self._datos_csv
+
+    def obtenerColumnasCSV(self):
+        return self._datos_csv_columns
+
+    def TablaEnNueva(self, datos, columnas):
+        from Vista import TablaCSV
+        self.vistaTabla = TablaCSV(datos, columnas, self.vista)
+        self.vistaTabla.show()
+
+
+
 
 

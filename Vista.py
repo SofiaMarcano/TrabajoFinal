@@ -1,12 +1,16 @@
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QLabel, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox, QFileDialog, QMessageBox, QSizePolicy
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
 from Imagenes import bgPrueba_rc
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-
+import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import (
+    QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout,
+    QHBoxLayout, QWidget, QFileDialog, QMessageBox,QFrame, QCheckBox, QSizePolicy,
+    QTableWidget, QTableWidgetItem,QComboBox
+)
 # vista/login_vista.py
 # from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
 # from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
@@ -146,21 +150,20 @@ class senales_tabla_menu_Vista(QMainWindow):
     def setup(self):
         self.senalesBoton.clicked.connect(self.elegirSenalVista)
         self.volverBoton.clicked.connect(self.volverMenu)
-        # self.tabularesBoton.clicked.connect(self.elegirTablaVista)
+        self.tabularesBoton.clicked.connect(self.elegirTablaVista)
 
     def elegirSenalVista(self):
         vistaElegirSenal = elegirSenalVentana(self)
-        vistaElegirSenal.asignarControlador(self.__controlador)
+        vistaElegirSenal.setControlador(self.__controlador)
         self.close()
         vistaElegirSenal.show()
-
-    # def elegirTablaVista(self):
-    #     vistaElegirTabla = elegirTablaVentana(self)
-    #     vistaElegirTabla.asignarControlador(self.__controlador)
-    #     self.close()
-    #     vistaElegirTabla.show()
+    def elegirTablaVista(self):
+        vistaCSV = CCSV(self)
+        vistaCSV.setControlador(self.__controlador)
+        self.close()
+        vistaCSV.show()
         
-    def asignarControlador(self,c):
+    def setControlador(self,c):
         self.__controlador = c
 
     def volverMenu(self):
@@ -175,10 +178,10 @@ class elegirSenalVentana(QMainWindow):
         self.setup()
 
     def setup(self):
-        self.abriSenal.clicked.connect(self.cargarSenal)
-        self.volverBoton.clicked.connect(self.volverMenu)
-
-    def asignarControlador(self,c):
+         self.senalesBoton.clicked.connect(self.cargarSenal)
+         self.tabularesBoton.clicked.connect(self.openCsv)
+         self.volverBoton.clicked.connect(self.volverMenu)
+    def setControlador(self,c):
         self.__controlador = c
 
     def cargarSenal(self):
@@ -186,13 +189,18 @@ class elegirSenalVentana(QMainWindow):
         if archivo !='':
             self.__controlador.recibirRuta(archivo)
             vistaElegirSenal = ElegirLlave(self)
-            vistaElegirSenal.asignarControlador(self.__controlador)
+            vistaElegirSenal.setControlador(self.__controlador)
             vistaElegirSenal.listarLlaves()
             self.close()
             vistaElegirSenal.show()
         else:
             self.seleccionetexto.setText("Archivo no válido")
             self.seleccionetexto.repaint()
+    def openCsv(self):
+        vistaCSV = CCSV(self)
+        vistaCSV.setControlador(self.__controlador)
+        self.close()
+        vistaCSV.show()
     def volverMenu(self):
         self.close()
         self.parent.show()
@@ -220,7 +228,7 @@ class ElegirLlave(QMainWindow):
         respuesta = self.__controlador.verificarLlave(llave)
         if respuesta == "OK":
             vistaSenal = senalVista(self)
-            vistaSenal.asignarControlador(self.__controlador)
+            vistaSenal.setControlador(self.__controlador)
             vistaSenal.cargarDatos(llave)
             self.close()
             vistaSenal.show()
@@ -255,7 +263,7 @@ class ElegirLlave(QMainWindow):
 
             msg.exec_()
 
-    def asignarControlador(self,c):
+    def setControlador(self,c):
         self.__controlador = c
     def volverMenu(self):
         self.close()
@@ -316,7 +324,7 @@ class senalVista(QMainWindow):
         # self.atras.clicked.connect(self.atrasar)
         # self.guardar.clicked.connect(self.guardar)
 
-    def asignarControlador(self,c):
+    def setControlador(self,c):
         self.__controlador = c
 
 
@@ -336,5 +344,269 @@ class senalVista(QMainWindow):
         self.close()
         self.parent.show()
 
+class CCSV(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.__controlador = None
+
+        self.setWindowTitle(" 🐱Cargar Datos Tabulares (.csv)")
+        self.setGeometry(450, 200, 600, 300)
+        self.setFixedSize(600, 300)
+        palette = QPalette()
+        palette.setColor(QPalette.Window, QColor("#1E1E2F"))
+        palette.setColor(QPalette.WindowText, QColor("#F0F0F0"))
+        self.setPalette(palette)
+        self.setStyleSheet("""
+            QLabel {
+                color: #F0F0F0;
+                font-size: 14px;
+            }
+            QLineEdit {
+                background-color: #2E2E3A;
+                border: 1px solid #555;
+                border-radius: 5px;
+                padding: 8px;
+                color: #F0F0F0;
+            }
+            QPushButton {
+                background-color: #00A8CC;
+                color: white;
+                font-weight: bold;
+                border-radius: 8px;
+                padding: 10px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #007EA7;
+            }
+        """)
+        self.labelTitulo = QLabel("Cargar Datos Tabulares (.csv)")
+        self.labelTitulo.setFont(QFont("Segoe UI", 16))
+        self.labelTitulo.setAlignment(Qt.AlignCenter)
+
+        self.labelEstado = QLabel("No hay archivo cargado.")
+        self.labelEstado.setAlignment(Qt.AlignCenter)
+        self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
+
+        self.inputRuta = QLineEdit()
+        self.inputRuta.setPlaceholderText("Ruta del archivo CSV")
+        self.inputRuta.setReadOnly(True)
+
+        self.botonSeleccionar = QPushButton("Seleccionar CSV")
+        self.botonSeleccionar.setCursor(QCursor(Qt.PointingHandCursor))
+
+        self.botonVisualizar = QPushButton("Visualizar tabla")
+        self.botonVisualizar.setCursor(QCursor(Qt.PointingHandCursor))
+
+        self.botonVolver = QPushButton("Volver")
+        self.botonVolver.setCursor(QCursor(Qt.PointingHandCursor))
+        # Layouts
+        mainLayout = QVBoxLayout()
+        mainLayout.setContentsMargins(30, 30, 30, 30)
+        mainLayout.setSpacing(20)
+
+        mainLayout.addWidget(self.labelTitulo)
+
+        rutaLayout = QHBoxLayout()
+        rutaLayout.addWidget(self.inputRuta)
+        rutaLayout.addWidget(self.botonSeleccionar)
+        mainLayout.addLayout(rutaLayout)
+
+        mainLayout.addWidget(self.labelEstado)
+
+        botonesLayout = QHBoxLayout()
+        botonesLayout.addStretch()
+        botonesLayout.addWidget(self.botonVisualizar)
+        botonesLayout.addWidget(self.botonVolver)
+        mainLayout.addLayout(botonesLayout)
+
+        centralWidget = QWidget()
+        centralWidget.setLayout(mainLayout)
+        self.setCentralWidget(centralWidget)
+        self.botonSeleccionar.clicked.connect(self.openCSV)
+        self.botonVisualizar.clicked.connect(self.seeTabla)
+        self.botonVolver.clicked.connect(self.volverMenu)
+
+    def setControlador(self, c):
+        self.__controlador = c
+
+    def openCSV(self):
+        a, _ = QFileDialog.getOpenFileName(
+            self, "Abrir archivo CSV", "", "Archivos CSV (*.csv)"
+        )
+        if a:
+            r= self.__controlador.procesarCSV(a)
+            if r== "OK":
+                self.inputRuta.setText(a)
+                self.labelEstado.setText("Archivo CSV cargado correctamente.")
+                self.labelEstado.setStyleSheet("color: #44DD44; font-weight: bold;")
+            else:
+                self.labelEstado.setText("Error al cargar el CSV.")
+                self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
+        else:
+            self.labelEstado.setText("Selección cancelada.")
+            self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
+
+    def seeTabla(self):
+        if self.__controlador:
+            datos = self.__controlador.obtenerDatosCSV()
+            columnas = self.__controlador.obtenerColumnasCSV()
+            if datos is not None:
+                self.__controlador.TablaEnNueva(datos, columnas)
+            else:
+                QMessageBox.warning(self, "Error", "No hay datos cargados.")
+        else:
+            QMessageBox.warning(self, "Error", "Controlador no asignado.")
+
+    def volverMenu(self):
+        self.close()
+        if self.parent:
+            self.parent.show()
 
 
+class TablaCSV(QMainWindow):
+    def __init__(self, datos, columnas=None, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.datos = datos
+        self.columnas = columnas
+
+        self.setWindowTitle(" 🐱Visualizador de Datos Tabulares (.csv)")
+        self.setGeometry(400, 150, 800, 600)
+        self.setFixedSize(800, 600)
+        palette = QPalette()
+        self.scatterColor = 'cyan'
+        self.colorOptions = ['cyan', 'magenta', 'yellow', 'red', 'green', 'blue', 'orange', 'purple', 'white', 'grey']
+        palette.setColor(QPalette.Window, QColor("#1E1E2F"))
+        palette.setColor(QPalette.WindowText, QColor("#F0F0F0"))
+        self.setPalette(palette)
+        self.setStyleSheet("""
+            QLabel {
+                color: #F0F0F0;
+                font-size: 14px;
+            }
+            QTableWidget {
+                background-color: #2E2E3A;
+                color: #F0F0F0;
+                gridline-color: #555;
+            }
+            QComboBox {
+                background-color: #2E2E3A;
+                color: #F0F0F0;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QPushButton {
+                background-color: #00A8CC;
+                color: white;
+                font-weight: bold;
+                border-radius: 8px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #007EA7;
+            }
+        """)
+
+        self.central = QWidget()
+        self.layout = QVBoxLayout()
+        self.central.setLayout(self.layout)
+        self.setCentralWidget(self.central)
+
+        self.labelTitulo = QLabel("Visualizador de Datos Tabulares (.csv)")
+        self.labelTitulo.setAlignment(Qt.AlignCenter)
+        self.labelTitulo.setFont(QFont("Segoe UI", 16))
+        self.layout.addWidget(self.labelTitulo)
+
+        # Tabla de datos
+        self.tabla = QTableWidget()
+        self.layout.addWidget(self.tabla)
+
+        # Selector de columnas
+        selectorLayout = QHBoxLayout()
+        self.comboX = QComboBox()
+        self.comboY = QComboBox()
+
+        selectorLayout.addWidget(QLabel("Columna X:"))
+        selectorLayout.addWidget(self.comboX)
+        selectorLayout.addWidget(QLabel("Columna Y:"))
+        selectorLayout.addWidget(self.comboY)
+        self.layout.addLayout(selectorLayout)
+
+        # Botón para graficar
+        self.botonGraficar = QPushButton("Graficar dispersión")
+        
+        self.layout.addWidget(self.botonGraficar)
+        colorLayout = QHBoxLayout()
+        self.labelColor = QLabel("🐱Color de puntos:")
+        self.comboColor = QComboBox()
+        self.comboColor.addItems(self.colorOptions)
+        self.comboColor.setCurrentText(self.scatterColor)
+        colorLayout.addWidget(self.labelColor)
+        colorLayout.addWidget(self.comboColor)
+        self.layout.addLayout(colorLayout)
+        # Botón volver
+        self.botonVolver = QPushButton("Volver")
+        self.layout.addWidget(self.botonVolver)
+
+        # Conexiones
+        self.botonGraficar.clicked.connect(self.graficar)
+        self.botonVolver.clicked.connect(self.volver)
+        self.comboColor.currentIndexChanged.connect(self.cambiarColor)
+        self.cargarDatos()
+    def cambiarColor(self):
+        self.scatterColor = self.comboColor.currentText()
+
+    def cargarDatos(self):
+        if hasattr(self.datos, 'shape'):
+            rows, cols = self.datos.shape
+            self.tabla.setRowCount(rows)
+            self.tabla.setColumnCount(cols)
+
+            if self.columnas is not None:
+                self.tabla.setHorizontalHeaderLabels(self.columnas)
+                self.comboX.addItems(self.columnas)
+                self.comboY.addItems(self.columnas)
+            else:
+                labels = [f"Columna {i+1}" for i in range(cols)]
+                self.tabla.setHorizontalHeaderLabels(labels)
+                self.comboX.addItems(labels)
+                self.comboY.addItems(labels)
+
+            for i in range(rows):
+                for j in range(cols):
+                    item = QTableWidgetItem(str(self.datos[i, j]))
+                    self.tabla.setItem(i, j, item)
+        else:
+            self.tabla.setRowCount(0)
+            self.tabla.setColumnCount(0)
+
+    def graficar(self):
+        try:
+            colX = self.comboX.currentIndex()
+            colY = self.comboY.currentIndex()
+
+            x = self.datos[:, colX]
+            y = self.datos[:, colY]
+
+            plt.style.use('dark_background')
+            fig, ax = plt.subplots(figsize=(6, 4))
+            ax.scatter(x, y, color=self.scatterColor, alpha=0.7)
+            ax.set_xlabel(self.comboX.currentText(), color='white', fontsize=12)
+            ax.set_ylabel(self.comboY.currentText(), color='white', fontsize=12)
+            ax.set_title("Gráfico de dispersión", color='white', fontsize=14)
+            ax.tick_params(axis='x', colors='white')
+            ax.tick_params(axis='y', colors='white')
+
+            ax.grid(True, color='#555')
+            plt.tight_layout()
+            plt.show()
+        except Exception as e:
+            print("Error al graficar:", e)
+
+
+    def volver(self):
+        self.close()
+        if self.parent:
+            self.parent.show()
