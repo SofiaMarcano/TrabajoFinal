@@ -169,5 +169,8 @@ class LoginControlador:
     
     def dLlaves(self):
         return self.modelo.devolverLlaves()
+    
+    def verificarLlave(self,llave):
+        return self.modelo.verLlave(llave)
 
 

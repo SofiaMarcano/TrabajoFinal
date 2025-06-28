@@ -193,13 +193,24 @@ class ElegirLlave(QMainWindow):
         self.setup()
 
     def setup(self):
-        self.continuarLlave.clicked.connect(self.verificarLlave)
+        self.continuarLlave.clicked.connect(self.verificar)
         pass
     
     def listarLlaves(self):
         self.__llaves = self.__controlador.dLlaves()
         self.comboBox.addItems(list(self.__llaves))
+        
         print(self.__llaves)
+
+    def verificar(self):
+        llave = self.comboBox.currentText()
+        respuesta = self.__controlador.verificarLlave(llave)
+        if respuesta == "OK":
+            pass
+        else:
+            self.seleccionetexto.setText(respuesta)
+            self.seleccionetexto.repaint()
+
 
     def asignarControlador(self,c):
         self.__controlador = c

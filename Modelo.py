@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.io as sio
 class ModeloBase:
     def __init__(self, conexion_mongo):
@@ -16,6 +17,13 @@ class ModeloBase:
         ##Añadir a db??
 
     def devolverLlaves(self):
-        archivo = sio.loadmat(self.__rutaMAT)
-        ll = archivo.keys()
+        self.__archivo = sio.loadmat(self.__rutaMAT)
+        ll = self.__archivo.keys()
         return ll
+    
+    def verLlave(self,llave):
+        valor = self.__archivo[llave]
+        if isinstance(valor, np.ndarray):
+            return "OK"
+        else:
+            return "Clave no válida"
