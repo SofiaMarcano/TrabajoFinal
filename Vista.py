@@ -151,7 +151,6 @@ class senales_tabla_menu_Vista(QMainWindow):
     def elegirSenalVista(self):
         vistaElegirSenal = elegirSenalVentana(self)
         vistaElegirSenal.asignarControlador(self.__controlador)
-        self.close()
         vistaElegirSenal.show()
 
     # def elegirTablaVista(self):
@@ -305,7 +304,7 @@ class senalVista(QMainWindow):
         
 
         self.volverBoton.clicked.connect(self.volverMenu)
-        # self.canalesBoton.clicked.connect(self.numCanales)
+        self.canalesBoton.clicked.connect(self.numCanales)
         # self.segmentarBoton.clicked.connect(self.segmentar)
         # self.estBoton.clicked.connect(self.est)
         # self.filtradoBoton.clicked.connect(self.filtrar)
@@ -335,6 +334,8 @@ class senalVista(QMainWindow):
         self.shapeTexto.repaint()
         self.spinBox.setValue(c)
 
+    def numCanales(self):
+        pass
 
     def volverMenu(self):
         self.close()
