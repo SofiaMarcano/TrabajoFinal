@@ -178,9 +178,10 @@ class elegirSenalVentana(QMainWindow):
         self.setup()
 
     def setup(self):
-         self.senalesBoton.clicked.connect(self.cargarSenal)
-         self.tabularesBoton.clicked.connect(self.openCsv)
-         self.volverBoton.clicked.connect(self.volverMenu)
+        #  self.senalesBoton.clicked.connect(self.cargarSenal)
+        #  self.tabularesBoton.clicked.connect(self.openCsv)
+        self.abriSenal.clicked.connect(self.cargarSenal)
+        self.volverBoton.clicked.connect(self.volverMenu)
     def setControlador(self,c):
         self.__controlador = c
 
