@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import datetime
-
+import pandas as pd
 class ConexionMongo:
     def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
         self.__cliente = MongoClient(uri)
@@ -55,9 +55,9 @@ class ConexionMongo:
                 {
                     "id": "ARCH002",
                     "tipo_archivo": "csv",
-                    "nombre_archivo": "datos.csv",
+                    "nombre_archivo": "brain_stoke",
                     "fecha": "20/07/2022",
-                    "ruta": r"C:/archivos/datos.csv"
+                    "ruta": r"ArchivosCSV\brain_stroke.csv"
                 }
             ])
         return m
@@ -75,3 +75,41 @@ class ConexionMongo:
             "exito": False,
             "fecha": {"$gte": limite} #La fecha es mayor o igual a limite
         })
+    def guardar_csv(self, nombre_archivo, ruta_archivo):
+        # Verificar si ya existe esa ruta
+        existente = self.__db["registro_archivos"].find_one({
+            "tipo_archivo": "csv",
+            "ruta": ruta_archivo
+        })
+
+        if existente:
+            print(f"⚠️ Ya existe en la base de datos con ruta: {ruta_archivo}")
+            return False  # Indicar que NO se insertó porque ya existía
+
+        # Insertar nuevo registro
+        registro = {
+            "id": "ARCH" + str(self.__db["registro_archivos"].count_documents({"tipo_archivo": "csv"}) + 1).zfill(3),
+            "tipo_archivo": "csv",
+            "nombre_archivo": nombre_archivo,
+            "fecha": datetime.datetime.now().strftime("%d/%m/%Y"),
+            "ruta": ruta_archivo
+        }
+        self.__db["registro_archivos"].insert_one(registro)
+        print(f"Insertado nuevo CSV en base con ruta: {ruta_archivo}")
+        return True  # Indicar éxito
+
+    def listar_csvs(self):
+        cursor = self.__db["registro_archivos"].find({"tipo_archivo": "csv"})
+        lista = list(cursor)
+        print(f"Listados {len(lista)} CSV en base.")
+        return lista
+
+    def obtener_csv_por_id(self, id_archivo):
+        doc = self.__db["registro_archivos"].find_one({"id": id_archivo})
+        if not doc:
+            return None
+        return doc["ruta"]
+
+    
+
+

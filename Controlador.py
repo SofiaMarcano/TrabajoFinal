@@ -4,13 +4,19 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
+import numpy as np
 
 # from Vista import ImagenVista
-from Vista import senales_tabla_menu_Vista
+from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
         self.modelo = modelo
+        self._datosCSV = None
+        self._columnasCSV = []
+        self._rutaCSV = None 
+        self._cargadoDesdeBase = False
+
         self.vista.boton_login.clicked.connect(self.ver_login) ## Conectar el botón de login con el método que valida el acceso
 
     def ver_login(self):
@@ -182,22 +188,62 @@ class LoginControlador:
 
     def devolverDatosSenal(self,min,max):
         return self.modelo.devolverSegmento(min, max)
+    def setCargadoDesdeBase(self, valor: bool):
+        self._cargadoDesdeBase = valor
+
     def procesarCSV(self, ruta):
-        df = pd.read_csv(ruta)
-        self._datos_csv = df.values
-        self._datos_csv_columns = list(df.columns)
+        try:
+            df = pd.read_csv(ruta)
+            self._datosCSV = df.to_numpy()
+            self._columnasCSV = list(df.columns)
+            self._rutaCSV = ruta       
+            return "OK"
+        except Exception as e:
+            print("Error al procesar CSV:", e)
+            return "ERROR"
+
+    def getRutaCSV(self):
+        return self._rutaCSV
+    def cargarCSVporID(self, id_archivo):
+        datos, columnas = self.modelo.cargarCSVporID(id_archivo)
+        if datos is None or columnas is None:
+            return "ERROR"
+        self._datosCSV = datos
+        self._columnasCSV = columnas
+        self._cargadoDesdeBase = True
+        print(f"CSV cargado desde base (ID: {id_archivo})")
         return "OK"
 
     def obtenerDatosCSV(self):
-        return self._datos_csv
+        return self._datosCSV
 
     def obtenerColumnasCSV(self):
-        return self._datos_csv_columns
+        return self._columnasCSV
+
+    def listarCSVs(self):
+        return self.modelo.listarCSVs()
 
     def TablaEnNueva(self, datos, columnas):
-        from Vista import TablaCSV
-        self.vistaTabla = TablaCSV(datos, columnas, self.vista)
+        self.vistaTabla = TablaCSV(
+            datos, columnas,
+            parent=self.vista,
+            controlador=self,
+            desdeBase=self._cargadoDesdeBase
+        )
         self.vistaTabla.show()
+    def guardarCSV(self, nombre, ruta):
+        resultado = self.modelo.guardarCSV(nombre, ruta)
+        return resultado
+
+
+
+
+
+
+
+    
+
+
 
 
 
