@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
+from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
 from Imagenes import bgPrueba_rc
@@ -239,7 +239,6 @@ class ElegirLlave(QMainWindow):
             msg.setText(f"La llave '{llave}' no es un arreglo.\nPor favor, intenta con otra.")
             msg.setIcon(QMessageBox.Warning)
 
-            # Aplica estilos
             msg.setStyleSheet("""
                 QMessageBox {
                     background-color: white;
@@ -275,30 +274,67 @@ class MyGraphCanvas(FigureCanvas):
         self.fig = Figure(figsize=(width,height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         FigureCanvas.__init__(self,self.fig)
+        self.fig.tight_layout()
+        self.parent = parent
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.updateGeometry()
+
+    def graficar(self, datos, min=0):
+        self.axes.clear()
+        try:
+            eje_x = np.arange(min, min + datos.shape[1])
+            for c in range(datos.shape[0]):
+                self.axes.plot(eje_x, datos[c,:] + c*10)
+
+            self.axes.set_xlabel('Muestras')
+            self.axes.set_ylabel('Voltaje (uV)')
+            self.axes.set_title('Señales EEG')
+            self.fig.patch.set_facecolor('none')
+            self.fig.tight_layout()
+            try:
+                self.axes.set_xlim(min, min + datos.shape[1] - 1)
+            except:
+                pass
+            self.draw() 
+        except:
+            pass
+
+class MyGraphCanvas2(FigureCanvas):
+    def __init__(self, parent = None, width=6, height=5, dpi=60):
+        self.fig = Figure(figsize=(width,height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        FigureCanvas.__init__(self,self.fig)
         self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.updateGeometry()
 
     def graficar(self, datos):
         self.axes.clear()
-        for c in range(datos.shape[0]):
-            self.axes.plot(datos[c,:] + c*10)
+        self.axes.stem(datos)
+        self.axes.set_xlabel("Canales")
+        self.axes.set_ylabel("Promedio")
+        self.axes.set_title("Promedio canales")
+        self.draw()  
 
-        self.axes.set_xlabel('Muestras')
-        self.axes.set_ylabel('Voltaje (uV)')
-        self.axes.set_title('Señales EEG')
-        self.fig.patch.set_facecolor('none')
-        self.fig.tight_layout()
-        self.draw() 
+    def graficar2(self, datos):
+        self.axes.clear()
+        try:
+            eje_x = np.arange(min, min + datos.shape[1])
+            for c in range(datos.shape[0]):
+                self.axes.plot(eje_x, datos[c,:] + c*10)
 
-    # def graficaProm(self,datos):
-    #     self.ax2 = self.fig.add_subplot(212)
-    #     self.ax2.stem(datos)
-    #     self.ax2.set_xlabel('Muestras')
-    #     self.ax2.set_ylabel('Voltaje (uV)')
-    #     self.ax2.set_title('Señales EEG')
-    #     self.draw()  
-
+            self.axes.set_xlabel('Muestras')
+            self.axes.set_ylabel('Voltaje (uV)')
+            self.axes.set_title('Señales EEG')
+            self.fig.patch.set_facecolor('none')
+            self.fig.tight_layout()
+            try:
+                self.axes.set_xlim(min, min + datos.shape[1] - 1)
+            except:
+                pass
+            self.draw() 
+        except:
+            pass
 class senalVista(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -311,13 +347,21 @@ class senalVista(QMainWindow):
         self.senalPpal.setLayout(self.layout)
         self.sc = MyGraphCanvas(self.senalPpal, width=5, height=4.5, dpi=60)
         self.layout.addWidget(self.sc)
+        self.min.setValidator(QIntValidator())
+        self.max.setValidator(QIntValidator())
+
+        self.layout2 = QVBoxLayout()
+        self.graficoEst.setLayout(self.layout2)
+        self.sc2 = MyGraphCanvas2(self.graficoEst)
+        self.layout2.addWidget(self.sc2)
         
 
         self.volverBoton.clicked.connect(self.volverMenu)
         self.canalesBoton.clicked.connect(self.numCanales)
-        # self.segmentarBoton.clicked.connect(self.segmentar)
-        # self.estBoton.clicked.connect(self.est)
-        # self.filtradoBoton.clicked.connect(self.filtrar)
+        self.segmentarBoton.clicked.connect(self.segmentar)
+        self.promedioBoton.clicked.connect(self.prom)
+        self.estBoton.clicked.connect(self.est)
+        self.filtradoBoton.clicked.connect(self.filtrar)
         # self.boxBoton.clicked.connect(self.boxplotear)
         # self.picosBoton.clicked.connect(self.picos)
         # self.histBoton.clicked.connect(self.histogramar)
@@ -330,10 +374,7 @@ class senalVista(QMainWindow):
 
 
     def cargarDatos(self,llave):
-        self.__arch = self.__controlador.dDatos()
-        data = self.__arch[llave]
-        c, m, e = data.shape
-        continua = np.reshape(data,(c,m*e), order = "F")
+        self.__arch, continua, c, m, e = self.__controlador.dDatos(llave)
         self.__controlador.rDatos(continua)
 
         self.x_min = 0
@@ -342,10 +383,37 @@ class senalVista(QMainWindow):
         self.sc.graficar(self.__controlador.devolverDatosSenal(self.x_min, self.x_max))
         self.shapeTexto.setText(f"Canales: {str(c)}, muestas: {str(m)}, épocas: {str(e)}")
         self.shapeTexto.repaint()
+        self.spinBox.setMaximum(c)
         self.spinBox.setValue(c)
 
     def numCanales(self):
-        pass
+        c = self.spinBox.value()
+        self.sc.graficar(self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c), self.x_min)
+
+    def segmentar(self):
+        try:
+            self.x_min = int(self.min.text())
+            self.x_max = int(self.max.text())
+            self.numCanales()
+        except:
+            self.numCanales()
+
+    def prom(self):
+        c = self.spinBox.value()
+        self.sc2.graficar(self.__controlador.devolverDatosSenalProm(self.__arch, c))
+    
+    def est(self):
+        c = self.spinBoxCanal.value()
+        promedio, desviacion = self.__controlador.getEstSenal(c)
+        self.resEstTexto.setText(f"Pro.: {str(promedio)} \nDE: {str(desviacion)}")
+        self.resEstTexto.repaint()
+
+    def filtrar(self):
+        c = self.spinBox.value()
+        datos = self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c)
+        filtrada = self.__controlador.llevarFiltro(datos)
+        self.sc2.graficar2(filtrada)
+
 
     def volverMenu(self):
         self.close()

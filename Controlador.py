@@ -174,14 +174,29 @@ class LoginControlador:
     def verificarLlave(self,llave):
         return self.modelo.verLlave(llave)
     
-    def dDatos(self):
-        return self.modelo.devolverData()
+    def dDatos(self, llave):
+        return self.modelo.devolverData(llave)
     
     def rDatos(self,d):
         self.modelo.recibirDatos(d)
 
-    def devolverDatosSenal(self,min,max):
-        return self.modelo.devolverSegmento(min, max)
+    def devolverDatosSenal(self,min,max,c=None):
+        return self.modelo.devolverSegmento(min, max,c)
+    
+    def devolverDatosSenalProm(self, a, c):
+        return self.modelo.dDatosSenalProm(a, c)
+    
+
+    def getEstSenal(self, c):
+        return self.modelo.getEst(c)
+    
+
+    def llevarFiltro(self,s):
+        return self.modelo.filtroSenal(s)
+    
+    
+    #######CSV########
+    
     def procesarCSV(self, ruta):
         df = pd.read_csv(ruta)
         self._datos_csv = df.values
@@ -199,7 +214,7 @@ class LoginControlador:
         self.vistaTabla = TablaCSV(datos, columnas, self.vista)
         self.vistaTabla.show()
 
-
+    
 
 
 
