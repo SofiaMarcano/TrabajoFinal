@@ -3,6 +3,7 @@ import scipy.io as sio
 from scipy.signal import butter, filtfilt
 from scipy import signal
 from scipy.signal import find_peaks
+import pandas as pd
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
@@ -80,3 +81,28 @@ class ModeloBase:
     def histSenal(self, epoca):
         datos_epoca = self.__data[:, :, epoca]
         return np.mean(datos_epoca, axis=1)
+    
+    def guardarCSV(self, nombre, ruta):
+        return self.__conexion.guardar_csv(nombre, ruta)
+
+
+    def listarCSVs(self):
+        return self.__conexion.listar_csvs()
+
+
+    def cargarCSVporID(self, id_archivo):
+        ruta = self.__conexion.obtener_csv_por_id(id_archivo)
+        if ruta is None:
+            return "ERROR"
+
+        try:
+            df = pd.read_csv(ruta)
+            columnas = list(df.columns)
+            datos = df.to_numpy()
+            return datos, columnas
+        except Exception as e:
+            print(f"Error al leer CSV desde ruta guardada: {e}")
+            return "ERROR"
+
+
+

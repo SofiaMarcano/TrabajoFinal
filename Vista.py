@@ -1,15 +1,15 @@
 import numpy as np
+import os
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
-from Imagenes import bgPrueba_rc
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout,
     QHBoxLayout, QWidget, QFileDialog, QMessageBox,QFrame, QCheckBox, QSizePolicy,
-    QTableWidget, QTableWidgetItem,QComboBox
+    QTableWidget, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout
 )
 # vista/login_vista.py
 # from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
@@ -476,15 +476,18 @@ class senalVista(QMainWindow):
         self.close()
         self.parent.show()
 
+
 class CCSV(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent = parent
         self.__controlador = None
 
-        self.setWindowTitle(" 🐱Cargar Datos Tabulares (.csv)")
-        self.setGeometry(450, 200, 600, 300)
-        self.setFixedSize(600, 300)
+        self.setWindowTitle("🐱 Cargar Datos Tabulares (.csv)")
+        self.setGeometry(450, 200, 600, 400)
+        self.setFixedSize(600, 400)
+
+        # Modo oscuro
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor("#1E1E2F"))
         palette.setColor(QPalette.WindowText, QColor("#F0F0F0"))
@@ -494,7 +497,7 @@ class CCSV(QMainWindow):
                 color: #F0F0F0;
                 font-size: 14px;
             }
-            QLineEdit {
+            QLineEdit, QComboBox {
                 background-color: #2E2E3A;
                 border: 1px solid #555;
                 border-radius: 5px;
@@ -504,16 +507,18 @@ class CCSV(QMainWindow):
             QPushButton {
                 background-color: #00A8CC;
                 color: white;
-                font-weight: bold;
                 border-radius: 8px;
                 padding: 10px;
                 font-size: 14px;
+                font-weight: bold;
             }
             QPushButton:hover {
                 background-color: #007EA7;
             }
         """)
-        self.labelTitulo = QLabel("Cargar Datos Tabulares (.csv)")
+
+        # ---------- Widgets ----------
+        self.labelTitulo = QLabel("🐱 Cargar Datos Tabulares (.csv)")
         self.labelTitulo.setFont(QFont("Segoe UI", 16))
         self.labelTitulo.setAlignment(Qt.AlignCenter)
 
@@ -521,6 +526,7 @@ class CCSV(QMainWindow):
         self.labelEstado.setAlignment(Qt.AlignCenter)
         self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
 
+        # Entrada de ruta local
         self.inputRuta = QLineEdit()
         self.inputRuta.setPlaceholderText("Ruta del archivo CSV")
         self.inputRuta.setReadOnly(True)
@@ -528,25 +534,46 @@ class CCSV(QMainWindow):
         self.botonSeleccionar = QPushButton("Seleccionar CSV")
         self.botonSeleccionar.setCursor(QCursor(Qt.PointingHandCursor))
 
+        # Selector de CSV guardados en base
+        self.comboDB = QComboBox()
+        self.botonCargarDB = QPushButton("⬇Cargar de DB")
+        self.botonCargarDB.setCursor(QCursor(Qt.PointingHandCursor))
+
+        # Botón para visualizar
         self.botonVisualizar = QPushButton("Visualizar tabla")
         self.botonVisualizar.setCursor(QCursor(Qt.PointingHandCursor))
 
+        # Botón volver
         self.botonVolver = QPushButton("Volver")
         self.botonVolver.setCursor(QCursor(Qt.PointingHandCursor))
-        # Layouts
+
+        # ---------- Layout ----------
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(30, 30, 30, 30)
         mainLayout.setSpacing(20)
 
         mainLayout.addWidget(self.labelTitulo)
 
+        # Cargar desde disco
         rutaLayout = QHBoxLayout()
         rutaLayout.addWidget(self.inputRuta)
         rutaLayout.addWidget(self.botonSeleccionar)
         mainLayout.addLayout(rutaLayout)
 
+        # Línea divisoria
+        mainLayout.addWidget(QLabel("—" * 50))
+
+        # Cargar desde base
+        dbLayout = QHBoxLayout()
+        dbLayout.addWidget(QLabel("CSV en BD:"))
+        dbLayout.addWidget(self.comboDB)
+        dbLayout.addWidget(self.botonCargarDB)
+        mainLayout.addLayout(dbLayout)
+
+        # Estado
         mainLayout.addWidget(self.labelEstado)
 
+        # Botones abajo
         botonesLayout = QHBoxLayout()
         botonesLayout.addStretch()
         botonesLayout.addWidget(self.botonVisualizar)
@@ -556,28 +583,57 @@ class CCSV(QMainWindow):
         centralWidget = QWidget()
         centralWidget.setLayout(mainLayout)
         self.setCentralWidget(centralWidget)
+
+        # ---------- Conexiones ----------
         self.botonSeleccionar.clicked.connect(self.openCSV)
+        self.botonCargarDB.clicked.connect(self.cargarDesdeBase)
         self.botonVisualizar.clicked.connect(self.seeTabla)
         self.botonVolver.clicked.connect(self.volverMenu)
 
     def setControlador(self, c):
         self.__controlador = c
+        if self.__controlador:
+            # Al asignar el controlador, pedirle los CSV guardados
+            lista = self.__controlador.listarCSVs()
+            self.comboDB.clear()
+            for item in lista:
+                self.comboDB.addItem(f"{item['id']} - {item['nombre_archivo']}", item['id'])
 
     def openCSV(self):
         a, _ = QFileDialog.getOpenFileName(
             self, "Abrir archivo CSV", "", "Archivos CSV (*.csv)"
         )
         if a:
-            r= self.__controlador.procesarCSV(a)
-            if r== "OK":
+            r = self.__controlador.procesarCSV(a)
+            if r == "OK":
                 self.inputRuta.setText(a)
-                self.labelEstado.setText("Archivo CSV cargado correctamente.")
+                self.labelEstado.setText("Archivo CSV cargado desde disco.")
                 self.labelEstado.setStyleSheet("color: #44DD44; font-weight: bold;")
+                self.__controlador.setCargadoDesdeBase(False)
             else:
                 self.labelEstado.setText("Error al cargar el CSV.")
                 self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
         else:
             self.labelEstado.setText("Selección cancelada.")
+            self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
+
+    def cargarDesdeBase(self):
+        if not self.__controlador:
+            QMessageBox.warning(self, "Error", "Controlador no asignado.")
+            return
+
+        id_archivo = self.comboDB.currentData()
+        if not id_archivo:
+            QMessageBox.warning(self, "Error", "No hay selección.")
+            return
+
+        resultado = self.__controlador.cargarCSVporID(id_archivo)
+        if resultado == "OK":
+            self.labelEstado.setText(f"Archivo CSV cargado desde base (ID: {id_archivo}).")
+            self.labelEstado.setStyleSheet("color: #44DD44; font-weight: bold;")
+            self.__controlador.setCargadoDesdeBase(True)
+        else:
+            self.labelEstado.setText("Error al cargar desde base.")
             self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
 
     def seeTabla(self):
@@ -596,45 +652,37 @@ class CCSV(QMainWindow):
         if self.parent:
             self.parent.show()
 
-
 class TablaCSV(QMainWindow):
-    def __init__(self, datos, columnas=None, parent=None):
+    def __init__(self, datos, columnas=None, parent=None, controlador=None, desdeBase=False,nombreCSV="grafico"):
         super().__init__(parent)
         self.parent = parent
         self.datos = datos
         self.columnas = columnas
+        self.__controlador = controlador
+        self.desdeBase = desdeBase
+        self.nombreCSV = nombreCSV
 
-        self.setWindowTitle(" 🐱Visualizador de Datos Tabulares (.csv)")
+        self.setWindowTitle("Visualizador de Datos Tabulares (.csv)")
         self.setGeometry(400, 150, 800, 600)
         self.setFixedSize(800, 600)
+
+        # --- MODO OSCURO ---
         palette = QPalette()
-        self.scatterColor = 'cyan'
-        self.colorOptions = ['cyan', 'magenta', 'yellow', 'red', 'green', 'blue', 'orange', 'purple', 'white', 'grey']
         palette.setColor(QPalette.Window, QColor("#1E1E2F"))
         palette.setColor(QPalette.WindowText, QColor("#F0F0F0"))
         self.setPalette(palette)
         self.setStyleSheet("""
-            QLabel {
+            QLabel, QComboBox, QTableWidget {
                 color: #F0F0F0;
+                background-color: #2E2E3A;
                 font-size: 14px;
-            }
-            QTableWidget {
-                background-color: #2E2E3A;
-                color: #F0F0F0;
-                gridline-color: #555;
-            }
-            QComboBox {
-                background-color: #2E2E3A;
-                color: #F0F0F0;
-                border-radius: 5px;
-                padding: 5px;
             }
             QPushButton {
                 background-color: #00A8CC;
                 color: white;
-                font-weight: bold;
                 border-radius: 8px;
                 padding: 10px;
+                font-weight: bold;
             }
             QPushButton:hover {
                 background-color: #007EA7;
@@ -651,11 +699,11 @@ class TablaCSV(QMainWindow):
         self.labelTitulo.setFont(QFont("Segoe UI", 16))
         self.layout.addWidget(self.labelTitulo)
 
-        # Tabla de datos
+        # --- TABLA ---
         self.tabla = QTableWidget()
         self.layout.addWidget(self.tabla)
 
-        # Selector de columnas
+        # --- Selector de columnas para graficar ---
         selectorLayout = QHBoxLayout()
         self.comboX = QComboBox()
         self.comboY = QComboBox()
@@ -666,37 +714,72 @@ class TablaCSV(QMainWindow):
         selectorLayout.addWidget(self.comboY)
         self.layout.addLayout(selectorLayout)
 
-        # Botón para graficar
-        self.botonGraficar = QPushButton("Graficar dispersión")
-        
-        self.layout.addWidget(self.botonGraficar)
+        # --- Selector de color de puntos ---
         colorLayout = QHBoxLayout()
-        self.labelColor = QLabel("🐱Color de puntos:")
+        self.labelColor = QLabel("Color de puntos:")
         self.comboColor = QComboBox()
+        self.colorOptions = ['cyan', 'red', 'green', 'yellow', 'magenta', 'blue', 'orange', 'purple', 'lime', 'pink']
         self.comboColor.addItems(self.colorOptions)
-        self.comboColor.setCurrentText(self.scatterColor)
         colorLayout.addWidget(self.labelColor)
         colorLayout.addWidget(self.comboColor)
         self.layout.addLayout(colorLayout)
-        # Botón volver
+
+        # --- Botones de análisis estadístico ---
+        self.botonEstadistica = QPushButton("Calcular Estadística")
+        self.layout.addWidget(self.botonEstadistica)
+
+        # --- Botones acción ---
+        self.botonGraficar = QPushButton("Graficar dispersión")
+        self.layout.addWidget(self.botonGraficar)
+
+        self.botonGuardar = QPushButton("Guardar en Base")
+        self.botonGuardar.setEnabled(not self.desdeBase)
+        self.layout.addWidget(self.botonGuardar)
+
         self.botonVolver = QPushButton("Volver")
         self.layout.addWidget(self.botonVolver)
 
-        # Conexiones
-        self.botonGraficar.clicked.connect(self.graficar)
+        # --- Conexiones ---
+        self.botonGraficar.clicked.connect(self.graficarScatter)
+        self.botonGuardar.clicked.connect(self.guardarEnBase)
         self.botonVolver.clicked.connect(self.volver)
-        self.comboColor.currentIndexChanged.connect(self.cambiarColor)
-        self.cargarDatos()
-    def cambiarColor(self):
-        self.scatterColor = self.comboColor.currentText()
+        self.botonEstadistica.clicked.connect(self.mostrarEstadisticaDialog)
 
-    def cargarDatos(self):
+        # --- Cargar datos iniciales ---
+        self.cargarDatosEnTabla()
+    def mostrarEstadisticaDialog(self):
+        if not self.columnas:
+            QMessageBox.warning(self, "Error", "No hay columnas disponibles.")
+            return
+        dialog = EstadisticaDialog(self.columnas, self)
+        if dialog.exec_() == QDialog.Accepted:
+            columna, operacion = dialog.getValues()
+            idx = self.columnas.index(columna)
+            datos_col = self.datos[:, idx]
+
+            # Intentar convertir a float
+            try:
+                datos_col_float = datos_col.astype(float)
+            except ValueError:
+                QMessageBox.warning(self, "Error", "La columna seleccionada contiene valores no numéricos o vacíos.")
+                return
+
+            # Calcular la estadística
+            if operacion == "Promedio":
+                resultado = np.mean(datos_col_float)
+            elif operacion == "Suma":
+                resultado = np.sum(datos_col_float)
+            else:
+                resultado = "Operación desconocida."
+
+            QMessageBox.information(self, "Resultado", f"{operacion} de '{columna}': {resultado:.2f}")
+
+    def cargarDatosEnTabla(self):
         if hasattr(self.datos, 'shape'):
             rows, cols = self.datos.shape
             self.tabla.setRowCount(rows)
             self.tabla.setColumnCount(cols)
-
-            if self.columnas is not None:
+            if self.columnas:
                 self.tabla.setHorizontalHeaderLabels(self.columnas)
                 self.comboX.addItems(self.columnas)
                 self.comboY.addItems(self.columnas)
@@ -705,40 +788,115 @@ class TablaCSV(QMainWindow):
                 self.tabla.setHorizontalHeaderLabels(labels)
                 self.comboX.addItems(labels)
                 self.comboY.addItems(labels)
-
             for i in range(rows):
                 for j in range(cols):
-                    item = QTableWidgetItem(str(self.datos[i, j]))
-                    self.tabla.setItem(i, j, item)
-        else:
-            self.tabla.setRowCount(0)
-            self.tabla.setColumnCount(0)
+                    self.tabla.setItem(i, j, QTableWidgetItem(str(self.datos[i, j])))
 
-    def graficar(self):
+    def graficarScatter(self):
         try:
             colX = self.comboX.currentIndex()
             colY = self.comboY.currentIndex()
-
             x = self.datos[:, colX]
             y = self.datos[:, colY]
+            color = self.comboColor.currentText()
 
             plt.style.use('dark_background')
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.scatter(x, y, color=self.scatterColor, alpha=0.7)
-            ax.set_xlabel(self.comboX.currentText(), color='white', fontsize=12)
-            ax.set_ylabel(self.comboY.currentText(), color='white', fontsize=12)
-            ax.set_title("Gráfico de dispersión", color='white', fontsize=14)
+            ax.scatter(x, y, color=color, alpha=0.7)
+            ax.set_xlabel(self.comboX.currentText(), color='white')
+            ax.set_ylabel(self.comboY.currentText(), color='white')
+            ax.set_title("Gráfico de dispersión", color='white')
             ax.tick_params(axis='x', colors='white')
             ax.tick_params(axis='y', colors='white')
-
             ax.grid(True, color='#555')
+            nombre_colX = self.comboX.currentText()
+            nombre_colY = self.comboY.currentText()
             plt.tight_layout()
             plt.show()
+            def preguntar_guardar():
+                reply = QMessageBox.question(
+                    self,
+                    "Guardar imagen",
+                    "¿Deseas guardar este gráfico como imagen?",
+                    QMessageBox.Yes | QMessageBox.No
+                )
+                if reply == QMessageBox.Yes:
+                    # Crear carpeta
+                    carpeta = "img"
+                    os.makedirs(carpeta, exist_ok=True)
+
+                    # Nombre base
+                    base_nombre = self.nombreCSV.replace(" ", "_")
+                    nombre_colX_clean = nombre_colX.replace(" ", "_")
+                    nombre_colY_clean = nombre_colY.replace(" ", "_")
+                    archivo_nombre = f"{base_nombre}_{nombre_colX_clean}_vs_{nombre_colY_clean}.png"
+                    ruta_completa = os.path.join(carpeta, archivo_nombre)
+
+                    # Guardar
+                    fig.savefig(ruta_completa)
+                    QMessageBox.information(self, "Guardado", f"Imagen guardada en:\n{ruta_completa}")
+
+            QTimer.singleShot(5000, preguntar_guardar)
         except Exception as e:
             print("Error al graficar:", e)
 
+    def mostrarPromedio(self):
+        try:
+            promedios = np.mean(self.datos, axis=0)
+            texto = "\n".join(f"{col}: {val:.2f}" for col, val in zip(self.columnas, promedios))
+            QMessageBox.information(self, "Promedio de columnas", texto)
+        except Exception as e:
+            print("Error en promedio:", e)
 
+    def mostrarSuma(self):
+        try:
+            sumas = np.sum(self.datos, axis=0)
+            texto = "\n".join(f"{col}: {val:.2f}" for col, val in zip(self.columnas, sumas))
+            QMessageBox.information(self, "Suma de columnas", texto)
+        except Exception as e:
+            print("Error en suma:", e)
+    def guardarEnBase(self):
+        if not self.__controlador or not self.__controlador.getRutaCSV():
+            QMessageBox.warning(self, "Error", "No se conoce la ruta del archivo CSV original.")
+            return
+
+        ruta_csv = self.__controlador.getRutaCSV()
+        nombre_archivo = os.path.basename(ruta_csv)  # Obtener solo el nombre del archivo
+
+        exito = self.__controlador.guardarCSV(nombre_archivo, ruta_csv)
+        if exito:
+            QMessageBox.information(self, "Guardado", f"CSV '{nombre_archivo}' guardado en base de datos.")
+        else:
+            QMessageBox.warning(self, "Duplicado", f"Ya existe un registro con la ruta '{ruta_csv}' en la base de datos.")
     def volver(self):
         self.close()
         if self.parent:
             self.parent.show()
+class EstadisticaDialog(QDialog):
+    def __init__(self, columnas, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Calcular Estadística")
+        self.setFixedSize(300, 150)
+
+        self.columnaSeleccionada = None
+        self.operacionSeleccionada = None
+
+        layout = QFormLayout()
+
+        self.comboColumna = QComboBox()
+        self.comboColumna.addItems(columnas)
+        layout.addRow("Columna:", self.comboColumna)
+
+        self.comboOperacion = QComboBox()
+        self.comboOperacion.addItems(["Promedio", "Suma"])
+        layout.addRow("Operación:", self.comboOperacion)
+
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        layout.addWidget(self.buttonBox)
+
+        self.setLayout(layout)
+
+    def getValues(self):
+        return self.comboColumna.currentText(), self.comboOperacion.currentText()

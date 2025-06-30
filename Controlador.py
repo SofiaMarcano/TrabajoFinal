@@ -4,15 +4,21 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
+import numpy as np
 from datetime import datetime
 import os
 
 # from Vista import ImagenVista
-from Vista import senales_tabla_menu_Vista
+from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
         self.modelo = modelo
+        self._datosCSV = None
+        self._columnasCSV = []
+        self._rutaCSV = None 
+        self._cargadoDesdeBase = False
+
         self.vista.boton_login.clicked.connect(self.ver_login) ## Conectar el botón de login con el método que valida el acceso
 
     def ver_login(self):
@@ -103,7 +109,7 @@ class LoginControlador:
 
         # Imagen con glow
         label_img = QLabel()
-        pixmap = QPixmap(r"Imagenes\Img22.jpg")
+        pixmap = QPixmap(r"img\Img22.jpg")
         if pixmap.isNull():
             label_img.setText("Imagen no encontrada.")
             label_img.setAlignment(Qt.AlignCenter)
@@ -134,7 +140,7 @@ class LoginControlador:
         self.easteregg_window.show()
 
         # 🔊 Sonido arcade
-        self.sonido_easteregg = QSound(r"Imagenes\539860__yipyep__arcade-trap-loop.wav")
+        self.sonido_easteregg = QSound(r"img\img56.wav")
         self.sonido_easteregg.play()
         self.colores = ["#00FFFF", "#FF00FF", "#FFFF00", "#FF4444", "#00FF00", "#FFA500"]
         self.color_index = 0
@@ -218,23 +224,71 @@ class LoginControlador:
             
     
     #######CSV########
+
+    def setCargadoDesdeBase(self, valor: bool):
+        self._cargadoDesdeBase = valor
     
     def procesarCSV(self, ruta):
-        df = pd.read_csv(ruta)
-        self._datos_csv = df.values
-        self._datos_csv_columns = list(df.columns)
+        try:
+            df = pd.read_csv(ruta)
+            self._datosCSV = df.to_numpy()
+            self._columnasCSV = list(df.columns)
+            self._rutaCSV = ruta       
+            return "OK"
+        except Exception as e:
+            print("Error al procesar CSV:", e)
+            return "ERROR"
+
+    def getRutaCSV(self):
+        return self._rutaCSV
+    def cargarCSVporID(self, id_archivo):
+        datos, columnas = self.modelo.cargarCSVporID(id_archivo)
+        if datos is None or columnas is None:
+            return "ERROR"
+        self._datosCSV = datos
+        self._columnasCSV = columnas
+        self._cargadoDesdeBase = True
+        print(f"CSV cargado desde base (ID: {id_archivo})")
         return "OK"
 
     def obtenerDatosCSV(self):
-        return self._datos_csv
+        return self._datosCSV
 
     def obtenerColumnasCSV(self):
-        return self._datos_csv_columns
+        return self._columnasCSV
 
-    def TablaEnNueva(self, datos, columnas):
-        from Vista import TablaCSV
-        self.vistaTabla = TablaCSV(datos, columnas, self.vista)
+    def listarCSVs(self):
+        return self.modelo.listarCSVs()
+    def TablaEnNueva(self,datos,columnas):
+        import os
+        if self._rutaCSV:
+            nombre_csv_base = os.path.basename(self._rutaCSV)
+            nombre_csv_base = os.path.splitext(nombre_csv_base)[0]
+        else:
+            nombre_csv_base = "grafico"
+
+        self.vistaTabla = TablaCSV(
+            datos, columnas,
+            parent=self.vista,
+            controlador=self,
+            desdeBase=self._cargadoDesdeBase,
+            nombreCSV=nombre_csv_base
+        )
         self.vistaTabla.show()
+        self.vistaTabla.show()
+    def guardarCSV(self, nombre, ruta):
+        resultado = self.modelo.guardarCSV(nombre, ruta)
+        return resultado
+
+
+
+
+
+
+
+    
+
+
 
     
 
