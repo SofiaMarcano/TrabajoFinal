@@ -311,8 +311,7 @@ QPushButton:pressed {
   </widget>
  </widget>
  <resources>
-  <include location="../Imagenes/bgPrueba.qrc"/>
-  <include location="fuentes/fuentes.qrc"/>
+  <include location="../Img/bgPrueba.qrc"/>
  </resources>
  <connections/>
 </ui>
