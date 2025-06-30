@@ -157,6 +157,7 @@ class senales_tabla_menu_Vista(QMainWindow):
         vistaElegirSenal.setControlador(self.__controlador)
         self.close()
         vistaElegirSenal.show()
+
     def elegirTablaVista(self):
         vistaCSV = CCSV(self)
         vistaCSV.setControlador(self.__controlador)
@@ -178,8 +179,6 @@ class elegirSenalVentana(QMainWindow):
         self.setup()
 
     def setup(self):
-        #  self.senalesBoton.clicked.connect(self.cargarSenal)
-        #  self.tabularesBoton.clicked.connect(self.openCsv)
         self.abriSenal.clicked.connect(self.cargarSenal)
         self.volverBoton.clicked.connect(self.volverMenu)
     def setControlador(self,c):
@@ -274,7 +273,6 @@ class MyGraphCanvas(FigureCanvas):
         self.fig = Figure(figsize=(width,height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         FigureCanvas.__init__(self,self.fig)
-        self.fig.tight_layout()
         self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.updateGeometry()
@@ -300,13 +298,14 @@ class MyGraphCanvas(FigureCanvas):
             pass
 
 class MyGraphCanvas2(FigureCanvas):
-    def __init__(self, parent = None, width=6, height=5, dpi=60):
+    def __init__(self, parent = None, width=5, height=5, dpi=60):
         self.fig = Figure(figsize=(width,height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         FigureCanvas.__init__(self,self.fig)
         self.parent = parent
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.updateGeometry()
+        
 
     def graficar(self, datos):
         self.axes.clear()
@@ -314,27 +313,43 @@ class MyGraphCanvas2(FigureCanvas):
         self.axes.set_xlabel("Canales")
         self.axes.set_ylabel("Promedio")
         self.axes.set_title("Promedio canales")
+        self.fig.tight_layout()
         self.draw()  
 
-    def graficar2(self, datos):
+    def graficar2(self, datos, min=0, picos = None, canal=0):
         self.axes.clear()
         try:
             eje_x = np.arange(min, min + datos.shape[1])
-            for c in range(datos.shape[0]):
-                self.axes.plot(eje_x, datos[c,:] + c*10)
+            if picos is None:
+                for c in range(datos.shape[0]):
+                    self.axes.plot(eje_x, datos[c,:] + c*10)
+            else:
+                self.axes.vlines(picos, ymin=datos.min(), ymax=datos.max(), linestyle='--',
+                                color='dodgerblue', label='Peak')
+                self.axes.plot(eje_x, datos[canal,:])
 
             self.axes.set_xlabel('Muestras')
             self.axes.set_ylabel('Voltaje (uV)')
             self.axes.set_title('Señales EEG')
             self.fig.patch.set_facecolor('none')
-            self.fig.tight_layout()
             try:
                 self.axes.set_xlim(min, min + datos.shape[1] - 1)
             except:
                 pass
+            self.fig.tight_layout()
             self.draw() 
         except:
-            pass
+            print("o no")
+
+    def graficarHistograma(self, datos, e):
+        self.axes.clear()
+        self.axes.hist(datos, bins=30, color='skyblue', edgecolor='black')
+        self.axes.set_xlabel('Amplitud')
+        self.axes.set_ylabel('Frecuencia')
+        self.axes.set_title(f"Histograma de época {e}")
+        self.fig.tight_layout()
+        self.draw()  
+
 class senalVista(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -362,29 +377,30 @@ class senalVista(QMainWindow):
         self.promedioBoton.clicked.connect(self.prom)
         self.estBoton.clicked.connect(self.est)
         self.filtradoBoton.clicked.connect(self.filtrar)
-        # self.boxBoton.clicked.connect(self.boxplotear)
-        # self.picosBoton.clicked.connect(self.picos)
-        # self.histBoton.clicked.connect(self.histogramar)
-        # self.adelante.clicked.connect(self.adelantar)
-        # self.atras.clicked.connect(self.atrasar)
-        # self.guardar.clicked.connect(self.guardar)
+        self.picosBoton.clicked.connect(self.picos)
+        self.histBoton.clicked.connect(self.histogramar)
+        self.adelante.clicked.connect(self.adelantar)
+        self.atras.clicked.connect(self.atrasar)
+        self.guardarBoton.clicked.connect(self.guardar)
 
     def setControlador(self,c):
         self.__controlador = c
 
 
     def cargarDatos(self,llave):
-        self.__arch, continua, c, m, e = self.__controlador.dDatos(llave)
+        self.__arch, continua, c, m, self.__e = self.__controlador.dDatos(llave)
         self.__controlador.rDatos(continua)
 
         self.x_min = 0
         self.x_max = 2000
 
         self.sc.graficar(self.__controlador.devolverDatosSenal(self.x_min, self.x_max))
-        self.shapeTexto.setText(f"Canales: {str(c)}, muestas: {str(m)}, épocas: {str(e)}")
+        self.shapeTexto.setText(f"Canales: {str(c)}, muestas: {str(m)}, épocas: {str(self.__e)}")
         self.shapeTexto.repaint()
         self.spinBox.setMaximum(c)
         self.spinBox.setValue(c)
+        self.fmSpinBox.setValue(1000)
+        self.fcSpinBox.setValue(10)
 
     def numCanales(self):
         c = self.spinBox.value()
@@ -410,10 +426,51 @@ class senalVista(QMainWindow):
 
     def filtrar(self):
         c = self.spinBox.value()
+        fs = self.fmSpinBox.value()
+        fc = self.fcSpinBox.value()
         datos = self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c)
-        filtrada = self.__controlador.llevarFiltro(datos)
-        self.sc2.graficar2(filtrada)
+        try:
+            filtrada = self.__controlador.llevarFiltro(datos, fs, fc)
+            self.sc2.graficar2(filtrada, self.x_min)
+        except:
+            self.fmText.setText(f"No válido")
+            self.fmText.repaint()
 
+    def picos(self):
+        c = self.spinBox.value()
+        cPicos = self.canalPicos.value()
+        picos = self.__controlador.llevarPicos(cPicos)
+        self.sc2.graficar2(self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c), self.x_min, picos, cPicos)
+        self.picosTexto.setText(f"Picos Total: {str(len(picos))}")
+        self.picosTexto.repaint()
+
+    def histogramar(self):
+        e = self.epocaSpinbox.value()
+        if 0 <= e < self.__e:
+            datos = self.__controlador.llevarHist(e)
+            self.sc2.graficarHistograma(datos, e)
+        else:
+            self.epocaText.setText(f"Error")
+            self.epocaText.repaint()
+
+    def adelantar(self):
+        self.x_min = self.x_min + 100
+        self.x_max = self.x_max + 100
+        self.numCanales()
+    
+    def atrasar(self):
+        self.x_min = self.x_min - 100
+        self.x_max = self.x_max - 100
+        self.numCanales()
+
+    def guardar(self):
+        if self.__controlador.guardar(self.sc.fig) == True:
+            self.guardarTexto.setText(f"Guardado")
+            self.guardarTexto.repaint()
+        else:
+            self.guardarTexto.setText("Error")
+            self.guardarTexto.repaint()
+        
 
     def volverMenu(self):
         self.close()

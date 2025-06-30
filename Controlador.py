@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
+from datetime import datetime
+import os
 
 # from Vista import ImagenVista
 from Vista import senales_tabla_menu_Vista
@@ -191,9 +193,29 @@ class LoginControlador:
         return self.modelo.getEst(c)
     
 
-    def llevarFiltro(self,s):
-        return self.modelo.filtroSenal(s)
+    def llevarFiltro(self,s, fs=1000, fc=10):
+        return self.modelo.filtroSenal(s, fs, fc)
     
+    def llevarPicos(self, c=0):
+        return self.modelo.picosSenal(c)
+    
+    def llevarHist(self, e=0):
+        return self.modelo.histSenal(e)
+    
+    def guardar(self, fig):
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            nombre_archivo = f"grafico_{timestamp}.png"
+            carpeta_salida = "graficosMAT"
+            os.makedirs(carpeta_salida, exist_ok=True)
+            ruta = os.path.join(carpeta_salida, nombre_archivo)
+            fig.savefig(ruta)
+            return True
+
+        except Exception as e:
+            print("Error al guardar gráfico:", e)
+            return False
+            
     
     #######CSV########
     

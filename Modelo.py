@@ -2,6 +2,7 @@ import numpy as np
 import scipy.io as sio
 from scipy.signal import butter, filtfilt
 from scipy import signal
+from scipy.signal import find_peaks
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
@@ -66,10 +67,16 @@ class ModeloBase:
         desviacion = np.round(np.std(señal), 3)
         return promedio, desviacion
     
-    def filtroSenal(self, senal):
-        fs = 1000
-        frecuencia_de_corte = 10
+    def filtroSenal(self, senal, fs, fc):
         orden = 4
-        b, a = butter(orden, frecuencia_de_corte / (0.5 * fs), btype='low')
+        b, a = butter(orden, fc / (0.5 * fs), btype='low')
         senal_filtrada = filtfilt(b, a, senal)
         return senal_filtrada
+    
+    def picosSenal(self, c):
+        peak_locations, _ = signal.find_peaks(self.__continua[c,:], prominence=0.01)
+        return peak_locations
+    
+    def histSenal(self, epoca):
+        datos_epoca = self.__data[:, :, epoca]
+        return np.mean(datos_epoca, axis=1)
