@@ -3,7 +3,6 @@ import os
 from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
-from Imagenes import bgPrueba_rc
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
@@ -529,13 +528,14 @@ class CCSV(QMainWindow):
             self.parent.show()
 
 class TablaCSV(QMainWindow):
-    def __init__(self, datos, columnas=None, parent=None, controlador=None, desdeBase=False):
+    def __init__(self, datos, columnas=None, parent=None, controlador=None, desdeBase=False,nombreCSV="grafico"):
         super().__init__(parent)
         self.parent = parent
         self.datos = datos
         self.columnas = columnas
         self.__controlador = controlador
         self.desdeBase = desdeBase
+        self.nombreCSV = nombreCSV
 
         self.setWindowTitle("Visualizador de Datos Tabulares (.csv)")
         self.setGeometry(400, 150, 800, 600)
@@ -684,8 +684,34 @@ class TablaCSV(QMainWindow):
             ax.tick_params(axis='x', colors='white')
             ax.tick_params(axis='y', colors='white')
             ax.grid(True, color='#555')
+            nombre_colX = self.comboX.currentText()
+            nombre_colY = self.comboY.currentText()
             plt.tight_layout()
             plt.show()
+            def preguntar_guardar():
+                reply = QMessageBox.question(
+                    self,
+                    "Guardar imagen",
+                    "¿Deseas guardar este gráfico como imagen?",
+                    QMessageBox.Yes | QMessageBox.No
+                )
+                if reply == QMessageBox.Yes:
+                    # Crear carpeta
+                    carpeta = "img"
+                    os.makedirs(carpeta, exist_ok=True)
+
+                    # Nombre base
+                    base_nombre = self.nombreCSV.replace(" ", "_")
+                    nombre_colX_clean = nombre_colX.replace(" ", "_")
+                    nombre_colY_clean = nombre_colY.replace(" ", "_")
+                    archivo_nombre = f"{base_nombre}_{nombre_colX_clean}_vs_{nombre_colY_clean}.png"
+                    ruta_completa = os.path.join(carpeta, archivo_nombre)
+
+                    # Guardar
+                    fig.savefig(ruta_completa)
+                    QMessageBox.information(self, "Guardado", f"Imagen guardada en:\n{ruta_completa}")
+
+            QTimer.singleShot(5000, preguntar_guardar)
         except Exception as e:
             print("Error al graficar:", e)
 

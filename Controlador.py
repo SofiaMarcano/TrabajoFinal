@@ -107,7 +107,7 @@ class LoginControlador:
 
         # Imagen con glow
         label_img = QLabel()
-        pixmap = QPixmap(r"Imagenes\Img22.jpg")
+        pixmap = QPixmap(r"img\Img22.jpg")
         if pixmap.isNull():
             label_img.setText("Imagen no encontrada.")
             label_img.setAlignment(Qt.AlignCenter)
@@ -138,7 +138,7 @@ class LoginControlador:
         self.easteregg_window.show()
 
         # 🔊 Sonido arcade
-        self.sonido_easteregg = QSound(r"Imagenes\539860__yipyep__arcade-trap-loop.wav")
+        self.sonido_easteregg = QSound(r"img\img56.wav")
         self.sonido_easteregg.play()
         self.colores = ["#00FFFF", "#FF00FF", "#FFFF00", "#FF4444", "#00FF00", "#FFA500"]
         self.color_index = 0
@@ -222,14 +222,22 @@ class LoginControlador:
 
     def listarCSVs(self):
         return self.modelo.listarCSVs()
+    def TablaEnNueva(self,datos,columnas):
+        import os
+        if self._rutaCSV:
+            nombre_csv_base = os.path.basename(self._rutaCSV)
+            nombre_csv_base = os.path.splitext(nombre_csv_base)[0]
+        else:
+            nombre_csv_base = "grafico"
 
-    def TablaEnNueva(self, datos, columnas):
         self.vistaTabla = TablaCSV(
             datos, columnas,
             parent=self.vista,
             controlador=self,
-            desdeBase=self._cargadoDesdeBase
+            desdeBase=self._cargadoDesdeBase,
+            nombreCSV=nombre_csv_base
         )
+        self.vistaTabla.show()
         self.vistaTabla.show()
     def guardarCSV(self, nombre, ruta):
         resultado = self.modelo.guardarCSV(nombre, ruta)
