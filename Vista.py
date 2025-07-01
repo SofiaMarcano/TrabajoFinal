@@ -144,6 +144,8 @@ class senalesMenuVista(QMainWindow):
         super().__init__()
         self.parent = parent
         loadUi("archivosUI/senalesVentana.ui",self)
+        self.setGeometry(500, 150, 600, 480)
+        self.setFixedSize(509, 415)
         self.setup()
 
     def setup(self):
@@ -176,6 +178,8 @@ class elegirSenalVentana(QMainWindow):
         super().__init__(parent)
         self.parent = parent
         loadUi("archivosUI/elegirSenalVentana.ui",self)
+        self.setGeometry(500, 150, 600, 480)
+        self.setFixedSize(755, 465)
         self.setup()
 
     def setup(self):
@@ -236,6 +240,8 @@ class ElegirLlave(QMainWindow):
         super().__init__(parent)
         self.parent = parent
         loadUi("archivosUI/elegirLlaveVentana.ui",self)
+        self.setGeometry(500, 150, 600, 480)
+        self.setFixedSize(755, 465)
         self.setup()
 
     def setup(self):
@@ -388,6 +394,8 @@ class senalVista(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         loadUi("archivosUI/senales.ui",self)
+        self.setGeometry(500, 150, 600, 480)
+        self.setFixedSize(755, 465)
         self.parent = parent
         self.setup()
 
