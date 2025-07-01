@@ -8,7 +8,7 @@ import os
 import datetime
 
 # from Vista import ImagenVista
-from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
+from Vista import senalesMenuVista ,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
