@@ -142,4 +142,99 @@ class ConexionMongo:
         self.__db["registro_archivos"].insert_one(registro)
         print(f"Insertado nuevo MAT en base con ruta: {ruta_archivo}")
         return True
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    def guardar_imagen(self, nombre_archivo, ruta_archivo, proceso, parametros):
+        contador = self.__db["registro_archivos_imagenes"].count_documents({}) + 1
+        registro = {
+            "id": "IMG" + str(contador).zfill(3),
+            "tipo_archivo": "imagen",
+            "nombre_archivo": nombre_archivo,
+            "ruta": ruta_archivo,
+            "proceso": proceso,
+            "parametros": parametros,
+        }
+
+        self.__db["registro_archivos_imagenes"].insert_one(registro)
+        print(f"Imagen registrada en la base de datos: {nombre_archivo}")
+        return True
+
+        
+
 

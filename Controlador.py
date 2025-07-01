@@ -4,9 +4,11 @@ from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
 import numpy as np
-from datetime import datetime
 import os
-from Vista import senalesMenuVista,CCSV,TablaCSV
+import datetime
+
+# from Vista import ImagenVista
+from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
@@ -57,8 +59,11 @@ class LoginControlador:
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
-            # self.panel = ImagenVista()
-            pass
+            self.panel = ProcesamientoImagenVista(
+                parent=self.vista, 
+                usuario= self.vista.input_usuario.text())
+            self.panel.setControlador(self)
+            self.panel.show()
         elif tipo == "senal":
             self.panel = senalesMenuVista(self.vista)
             self.panel.setControlador(self)
@@ -296,6 +301,10 @@ class LoginControlador:
         return resultado
     def getDatosColumnas(self):
         return self._datosCSV, self._columnasCSV
+
+    def guardarImagen(self, nombre, ruta, proceso, parametros):
+        resultado = self.modelo.guardarImagen(nombre, ruta, proceso, parametros)
+        return resultado
 
 
 
