@@ -5,7 +5,7 @@ from PyQt5.QtMultimedia import QSound
 import pandas as pd
 import numpy as np
 import os
-import datetime
+from datetime import datetime
 
 # from Vista import ImagenVista
 from Vista import senalesMenuVista ,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
