@@ -11,11 +11,9 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QWidget, QFileDialog, QMessageBox,QFrame, QCheckBox, QSizePolicy,
     QTableWidget, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout
 )
-# vista/login_vista.py
-# from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
-# from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
-# from PyQt5.QtCore import Qt
+from Img import bgPrueba_rc
 
+#########################################LOGIN#############################################
 class LoginVista(QWidget):
     def __init__(self):
         super().__init__()
@@ -126,6 +124,7 @@ class LoginVista(QWidget):
         self.label_error.setStyleSheet("color: red; font-weight: bold;")
         self.label_error.setVisible(True)
         QTimer.singleShot(4000, lambda: self.label_error.clear())
+
     def espera(self):
         self.setCursor(QCursor(Qt.WaitCursor))
 
@@ -139,8 +138,8 @@ class LoginVista(QWidget):
         else:
             self.input_password.setEchoMode(QLineEdit.Password)
 
-
-class senales_tabla_menu_Vista(QMainWindow):
+###########################################EXPERTO EN SEÑALES MENU###########################################
+class senalesMenuVista(QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
@@ -149,8 +148,8 @@ class senales_tabla_menu_Vista(QMainWindow):
 
     def setup(self):
         self.senalesBoton.clicked.connect(self.elegirSenalVista)
-        self.volverBoton.clicked.connect(self.volverMenu)
         self.tabularesBoton.clicked.connect(self.elegirTablaVista)
+        self.volverBoton.clicked.connect(self.volverMenu)
 
     def elegirSenalVista(self):
         vistaElegirSenal = elegirSenalVentana(self)
@@ -171,6 +170,7 @@ class senales_tabla_menu_Vista(QMainWindow):
         self.close()
         self.parent.show()
 
+############################################MAT#########################################################
 class elegirSenalVentana(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -179,10 +179,19 @@ class elegirSenalVentana(QMainWindow):
         self.setup()
 
     def setup(self):
-        self.abriSenal.clicked.connect(self.cargarSenal)
+        self.abrirSenal.clicked.connect(self.cargarSenal)
+        self.cargarMAT.clicked.connect(self.subirdeDB)
         self.volverBoton.clicked.connect(self.volverMenu)
+
     def setControlador(self,c):
         self.__controlador = c
+        self.listarMat()
+        
+    def listarMat(self):
+        self.comboBoxDBMAT.clear()
+        listadbmats = self.__controlador.listarMATs()
+        for item in listadbmats:
+                self.comboBoxDBMAT.addItem(f"{item['id']} - {item['nombre_archivo']}", item['ruta'])
 
     def cargarSenal(self):
         archivo, _ = QFileDialog.getOpenFileName(self, "Abrir señal","","Archivos mat (*.mat)")
@@ -194,20 +203,36 @@ class elegirSenalVentana(QMainWindow):
             self.close()
             vistaElegirSenal.show()
         else:
-            self.seleccionetexto.setText("Archivo no válido")
-            self.seleccionetexto.repaint()
-    def openCsv(self):
-        vistaCSV = CCSV(self)
-        vistaCSV.setControlador(self.__controlador)
-        self.close()
-        vistaCSV.show()
+            self.seleccioneTexto.setText("Archivo no válido")
+            self.seleccioneTexto.repaint()
+
     def volverMenu(self):
         self.close()
         self.parent.show()
-            
 
+    def subirdeDB(self):
+        try:
+            ruta = self.comboBoxDBMAT.currentData()
+            if ruta !='':
+                self.__controlador.recibirRuta(ruta)
+                vistaElegirSenal = ElegirLlave(self)
+                vistaElegirSenal.setControlador(self.__controlador)
+                vistaElegirSenal.listarLlaves()
+                self.close()
+                vistaElegirSenal.show()
+            else:
+                self.seleccioneTexto.setText("Archivo no válido")
+                self.seleccioneTexto.repaint()
+        except Exception as e:
+            print(str(e))
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Ha ocurrido un error al cargar el archivo")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
+            
 class ElegirLlave(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent = None):
         super().__init__(parent)
         self.parent = parent
         loadUi("archivosUI/elegirLlaveVentana.ui",self)
@@ -218,9 +243,8 @@ class ElegirLlave(QMainWindow):
         self.volverBoton.clicked.connect(self.volverMenu)
     
     def listarLlaves(self):
-        self.__llaves = self.__controlador.dLlaves()
+        self.__llaves = self.__controlador.llevarLlaves()
         self.comboBox.addItems(list(self.__llaves))
-        
         print(self.__llaves)
 
     def verificar(self):
@@ -264,7 +288,9 @@ class ElegirLlave(QMainWindow):
 
     def setControlador(self,c):
         self.__controlador = c
+        
     def volverMenu(self):
+        self.parent.listarMat()
         self.close()
         self.parent.show()
 
@@ -286,7 +312,7 @@ class MyGraphCanvas(FigureCanvas):
 
             self.axes.set_xlabel('Muestras')
             self.axes.set_ylabel('Voltaje (uV)')
-            self.axes.set_title('Señales EEG')
+            self.axes.set_title('Señal')
             self.fig.patch.set_facecolor('none')
             self.fig.tight_layout()
             try:
@@ -295,7 +321,11 @@ class MyGraphCanvas(FigureCanvas):
                 pass
             self.draw() 
         except:
-            pass
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Ha ocurrido un error al graficar la señal")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
 class MyGraphCanvas2(FigureCanvas):
     def __init__(self, parent = None, width=5, height=5, dpi=60):
@@ -307,7 +337,7 @@ class MyGraphCanvas2(FigureCanvas):
         self.updateGeometry()
         
 
-    def graficar(self, datos):
+    def graficarPromedio(self, datos):
         self.axes.clear()
         self.axes.stem(datos)
         self.axes.set_xlabel("Canales")
@@ -316,7 +346,7 @@ class MyGraphCanvas2(FigureCanvas):
         self.fig.tight_layout()
         self.draw()  
 
-    def graficar2(self, datos, min=0, picos = None, canal=0):
+    def graficarSenal(self, datos, min=0, picos=None, canal=0):
         self.axes.clear()
         try:
             eje_x = np.arange(min, min + datos.shape[1])
@@ -330,7 +360,7 @@ class MyGraphCanvas2(FigureCanvas):
 
             self.axes.set_xlabel('Muestras')
             self.axes.set_ylabel('Voltaje (uV)')
-            self.axes.set_title('Señales EEG')
+            self.axes.set_title('Señales')
             self.fig.patch.set_facecolor('none')
             try:
                 self.axes.set_xlim(min, min + datos.shape[1] - 1)
@@ -339,14 +369,18 @@ class MyGraphCanvas2(FigureCanvas):
             self.fig.tight_layout()
             self.draw() 
         except:
-            print("o no")
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Ha ocurrido un error al graficar la señal")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
-    def graficarHistograma(self, datos, e):
+    def graficarHistograma(self, datos, epoca):
         self.axes.clear()
         self.axes.hist(datos, bins=30, color='skyblue', edgecolor='black')
         self.axes.set_xlabel('Amplitud')
         self.axes.set_ylabel('Frecuencia')
-        self.axes.set_title(f"Histograma de época {e}")
+        self.axes.set_title(f"Histograma de época {epoca}")
         self.fig.tight_layout()
         self.draw()  
 
@@ -360,7 +394,7 @@ class senalVista(QMainWindow):
     def setup(self):
         self.layout = QVBoxLayout()
         self.senalPpal.setLayout(self.layout)
-        self.sc = MyGraphCanvas(self.senalPpal, width=5, height=4.5, dpi=60)
+        self.sc = MyGraphCanvas(self.senalPpal, width=5, height=4, dpi=60)
         self.layout.addWidget(self.sc)
         self.min.setValidator(QIntValidator())
         self.max.setValidator(QIntValidator())
@@ -385,20 +419,25 @@ class senalVista(QMainWindow):
 
     def setControlador(self,c):
         self.__controlador = c
+        self.guardarEnBase()
 
 
     def cargarDatos(self,llave):
-        self.__arch, continua, c, m, self.__e = self.__controlador.dDatos(llave)
-        self.__controlador.rDatos(continua)
+        self.__arch, continua, self.__c, self.__m, self.__e = self.__controlador.llevarDatos(llave)
 
+        #Datos predeterminados
         self.x_min = 0
         self.x_max = 2000
 
         self.sc.graficar(self.__controlador.devolverDatosSenal(self.x_min, self.x_max))
-        self.shapeTexto.setText(f"Canales: {str(c)}, muestas: {str(m)}, épocas: {str(self.__e)}")
+        self.shapeTexto.setText(f"Canales: {str(self.__c)}, muestas: {str(self.__m)}, épocas: {str(self.__e)}")
         self.shapeTexto.repaint()
-        self.spinBox.setMaximum(c)
-        self.spinBox.setValue(c)
+        self.spinBox.setMaximum(self.__c)
+        self.spinBoxCanal.setMaximum(self.__c)
+        self.epocaSpinbox.setMaximum(self.__e)
+        self.spinBox.setValue(self.__c)
+        #fm = frecuencia muestreo, fc = frecuencia corte
+        #valores predeterminados
         self.fmSpinBox.setValue(1000)
         self.fcSpinBox.setValue(10)
 
@@ -412,11 +451,15 @@ class senalVista(QMainWindow):
             self.x_max = int(self.max.text())
             self.numCanales()
         except:
-            self.numCanales()
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"No ha ingresado bien los valores")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
     def prom(self):
         c = self.spinBox.value()
-        self.sc2.graficar(self.__controlador.devolverDatosSenalProm(self.__arch, c))
+        self.sc2.graficarPromedio(self.__controlador.devolverDatosSenalProm(self.__arch, c))
     
     def est(self):
         c = self.spinBoxCanal.value()
@@ -431,16 +474,19 @@ class senalVista(QMainWindow):
         datos = self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c)
         try:
             filtrada = self.__controlador.llevarFiltro(datos, fs, fc)
-            self.sc2.graficar2(filtrada, self.x_min)
+            self.sc2.graficarSenal(filtrada, self.x_min)
         except:
-            self.fmText.setText(f"No válido")
-            self.fmText.repaint()
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Hay un valor no válido")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
     def picos(self):
         c = self.spinBox.value()
         cPicos = self.canalPicos.value()
         picos = self.__controlador.llevarPicos(cPicos)
-        self.sc2.graficar2(self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c), self.x_min, picos, cPicos)
+        self.sc2.graficarSenal(self.__controlador.devolverDatosSenal(self.x_min, self.x_max,c), self.x_min, picos, cPicos)
         self.picosTexto.setText(f"Picos Total: {str(len(picos))}")
         self.picosTexto.repaint()
 
@@ -450,8 +496,11 @@ class senalVista(QMainWindow):
             datos = self.__controlador.llevarHist(e)
             self.sc2.graficarHistograma(datos, e)
         else:
-            self.epocaText.setText(f"Error")
-            self.epocaText.repaint()
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Fuera de rango")
+            msg.setIcon(QMessageBox.Warning)
+            msg.exec_()
 
     def adelantar(self):
         self.x_min = self.x_min + 100
@@ -470,13 +519,26 @@ class senalVista(QMainWindow):
         else:
             self.guardarTexto.setText("Error")
             self.guardarTexto.repaint()
-        
 
     def volverMenu(self):
         self.close()
         self.parent.show()
 
 
+    def guardarEnBase(self):
+        if not self.__controlador or not self.__controlador.devolverRutaMAT():
+            QMessageBox.warning(self, "Error", "No se conoce la ruta del archivo MAT original.")
+            return
+
+        ruta_mat = self.__controlador.devolverRutaMAT()
+        nombre_archivo = os.path.basename(ruta_mat)
+        exito = self.__controlador.guardarBD(nombre_archivo, ruta_mat)
+        if exito:
+            print(self, "Guardado", f"MAT '{nombre_archivo}' guardado en base de datos.")
+        else:
+            print(self, "Duplicado", f"Ya existe un registro con la ruta '{ruta_mat}' en la base de datos.")
+
+###################################################CSV##############################################################
 class CCSV(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -592,6 +654,7 @@ class CCSV(QMainWindow):
 
     def setControlador(self, c):
         self.__controlador = c
+        self.__controlador.vista = self
         if self.__controlador:
             # Al asignar el controlador, pedirle los CSV guardados
             lista = self.__controlador.listarCSVs()
@@ -855,6 +918,7 @@ class TablaCSV(QMainWindow):
             QMessageBox.information(self, "Suma de columnas", texto)
         except Exception as e:
             print("Error en suma:", e)
+            
     def guardarEnBase(self):
         if not self.__controlador or not self.__controlador.getRutaCSV():
             QMessageBox.warning(self, "Error", "No se conoce la ruta del archivo CSV original.")

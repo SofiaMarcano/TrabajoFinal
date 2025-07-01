@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import scipy.io as sio
 from scipy.signal import butter, filtfilt
@@ -7,6 +8,8 @@ import pandas as pd
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
+
+############################################LOGIN###################################################
     def val_usuario(self, usuario, password):
         return self.__conexion.verf_usu(usuario, password)
     def fallos(self, usuario):
@@ -14,16 +17,14 @@ class ModeloBase:
     def reg_acceso(self, usuario, exito):
         self.__conexion.reg_acceso(usuario, exito)
 
-    #######MAT######
-    def recibirRuta(self,r):
-        self.__rutaMAT = r
-        print("RUTA EN MODELO "+ self.__rutaMAT)
-        ##Añadir a db??
+#############################################MAT#####################################################
+    def recibirRuta(self,ruta):
+        self.__rutaMAT = ruta
 
     def devolverLlaves(self):
         self.__archivo = sio.loadmat(self.__rutaMAT)
-        ll = self.__archivo.keys()
-        return ll
+        llaves = self.__archivo.keys()
+        return llaves
     
     def verLlave(self,llave):
         valor = self.__archivo[llave]
@@ -34,24 +35,18 @@ class ModeloBase:
     
     def devolverData(self,llave):
         self.__data = self.__archivo[llave]
-        c, m, e = self.__data.shape
-        self.__continua = np.reshape(self.__data,(c,m*e), order = "F")
-        return self.__data, self.__continua, c, m, e
-    
-    def recibirDatos(self,datos):
-        self.data = datos
-        self.canales = datos.shape[0]
-        self.muestras = datos.shape[1]
-        
+        self.canales, self.muestras, e = self.__data.shape
+        self.__continua = np.reshape(self.__data,(self.canales,self.muestras*e), order = "F")
+        return self.__data, self.__continua, self.canales, self.muestras, e
 
     def devolverSegmento(self, x_min, x_max, c = None):
         try:
             if x_min >= x_max:
                 return False
             if c == None:
-                return self.data[:,x_min:x_max]
+                return self.__continua[:,x_min:x_max]
             else:
-                return self.data[:c,x_min:x_max]
+                return self.__continua[:c,x_min:x_max]
         except:
             return None
         
@@ -59,7 +54,6 @@ class ModeloBase:
         self.__promedio = np.mean(a[:c, :, :], axis=1)
         self.__promedio = np.mean(self.__promedio, axis=1)
         return self.__promedio
-    
 
     def getEst(self, c):
         recorte = self.__data[c,:, :]
@@ -80,15 +74,23 @@ class ModeloBase:
     
     def histSenal(self, epoca):
         datos_epoca = self.__data[:, :, epoca]
-        return np.mean(datos_epoca, axis=1)
+        return np.mean(datos_epoca, axis=0)
     
+    def listarMATs(self):
+        return self.__conexion.listar_mats()
+    
+    def verRutaMAT(self):
+        return os.path.relpath(self.__rutaMAT)
+    
+    def guardarMAT(self, nombre, ruta):
+        return self.__conexion.guardar_mat(nombre, ruta)
+    
+##################################################CSV################################################
     def guardarCSV(self, nombre, ruta):
         return self.__conexion.guardar_csv(nombre, ruta)
 
-
     def listarCSVs(self):
         return self.__conexion.listar_csvs()
-
 
     def cargarCSVporID(self, id_archivo):
         ruta = self.__conexion.obtener_csv_por_id(id_archivo)
