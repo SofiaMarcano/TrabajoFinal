@@ -62,6 +62,10 @@ class ModeloBase:
         except Exception as e:
             print(f"Error al leer CSV desde ruta guardada: {e}")
             return "ERROR"
+    
+    def guardarImagen(self, nombre, ruta, proceso, parametros):
+        return self.__conexion.guardar_imagen(nombre, ruta, proceso, parametros)
+
 
 
 
