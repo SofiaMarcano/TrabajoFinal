@@ -4,9 +4,11 @@ from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
 import numpy as np
+import os
+import datetime
 
 # from Vista import ImagenVista
-from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV
+from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista

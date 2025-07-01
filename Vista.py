@@ -975,7 +975,7 @@ class EstadisticaDialog(QDialog):
     def getValues(self):
         return self.comboColumna.currentText(), self.comboOperacion.currentText()
  
-
+###################PROCESAMIENTO DE IMAGENES##########################
 class ProcesamientoImagenVista(QMainWindow):
     def __init__(self, parent=None, usuario="Desconocido"):
         super().__init__(parent)
