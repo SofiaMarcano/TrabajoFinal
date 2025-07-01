@@ -243,7 +243,7 @@ class LoginControlador:
             return "ERROR"
 
     def getRutaCSV(self):
-        return self._rutaCSV
+        return os.path.relpath(self._rutaCSV)
     
     def cargarCSVporID(self, id_archivo):
         datos, columnas = self.modelo.cargarCSVporID(id_archivo)

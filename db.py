@@ -92,7 +92,7 @@ class ConexionMongo:
 
         # Insertar nuevo registro
         registro = {
-            "id": "ARCH" + str(self.__db["registro_archivos"].count_documents({"tipo_archivo": "csv"}) + 1).zfill(3),
+            "id": "ARCH" + str(self.__db["registro_archivos"].count_documents({}) + 1).zfill(3),
             "tipo_archivo": "csv",
             "nombre_archivo": nombre_archivo,
             "fecha": datetime.datetime.now().strftime("%d/%m/%Y"),

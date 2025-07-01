@@ -185,6 +185,10 @@ class elegirSenalVentana(QMainWindow):
 
     def setControlador(self,c):
         self.__controlador = c
+        self.listarMat()
+        
+    def listarMat(self):
+        self.comboBoxDBMAT.clear()
         listadbmats = self.__controlador.listarMATs()
         for item in listadbmats:
                 self.comboBoxDBMAT.addItem(f"{item['id']} - {item['nombre_archivo']}", item['ruta'])
@@ -286,6 +290,7 @@ class ElegirLlave(QMainWindow):
         self.__controlador = c
         
     def volverMenu(self):
+        self.parent.listarMat()
         self.close()
         self.parent.show()
 
@@ -516,7 +521,6 @@ class senalVista(QMainWindow):
             self.guardarTexto.repaint()
 
     def volverMenu(self):
-        self.parent.listarLlaves()
         self.close()
         self.parent.show()
 
@@ -530,9 +534,9 @@ class senalVista(QMainWindow):
         nombre_archivo = os.path.basename(ruta_mat)
         exito = self.__controlador.guardarBD(nombre_archivo, ruta_mat)
         if exito:
-            QMessageBox.information(self, "Guardado", f"MAT '{nombre_archivo}' guardado en base de datos.")
+            print(self, "Guardado", f"MAT '{nombre_archivo}' guardado en base de datos.")
         else:
-            QMessageBox.warning(self, "Duplicado", f"Ya existe un registro con la ruta '{ruta_mat}' en la base de datos.")
+            print(self, "Duplicado", f"Ya existe un registro con la ruta '{ruta_mat}' en la base de datos.")
 
 ###################################################CSV##############################################################
 class CCSV(QMainWindow):
@@ -540,7 +544,6 @@ class CCSV(QMainWindow):
         super().__init__(parent)
         self.parent = parent
         self.__controlador = None
-        self.__controlador.setParent(self)
 
         self.setWindowTitle("🐱 Cargar Datos Tabulares (.csv)")
         self.setGeometry(450, 200, 600, 400)
