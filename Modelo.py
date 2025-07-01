@@ -8,7 +8,7 @@ import pandas as pd
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
-
+        
 ############################################LOGIN###################################################
     def val_usuario(self, usuario, password):
         return self.__conexion.verf_usu(usuario, password)
@@ -107,14 +107,11 @@ class ModeloBase:
             return nombre_archivo, datos, columnas
         except Exception as e:
             print(f"Error al leer CSV desde ruta guardada: {e}")
-<<<<<<< HEAD
-=======
             return "ERROR"
     
     def guardarImagen(self, nombre, ruta, proceso, parametros):
         return self.__conexion.guardar_imagen(nombre, ruta, proceso, parametros)
 
->>>>>>> e6fd76cddc1bdc0368cacc12db77b8bb6a7d42cd
 
 
 

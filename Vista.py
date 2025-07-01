@@ -1121,7 +1121,8 @@ class ProcesamientoImagenVista(QMainWindow):
         self.botonVolver.clicked.connect(self.volver)
         self.sliderKernel.valueChanged.connect(lambda: self.labelKernel.setText(f"Kernel: {self.sliderKernel.value()}"))
         self.comboProceso.currentTextChanged.connect(self.verificarVisibilidadKernel)
-        
+        self.checkboxMostrar.stateChanged.connect(self.actualizarImagenMostrada)
+
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
 
@@ -1202,6 +1203,8 @@ class ProcesamientoImagenVista(QMainWindow):
         self.imagen_procesada = img_proc
         if self.checkboxMostrar.isChecked():
             self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
+        else: 
+            self.mostrarImagen(img_proc, titulo=proceso)
         self.mostrarImagen(img_proc, titulo=proceso)
 
         # Registro 
@@ -1242,3 +1245,11 @@ class ProcesamientoImagenVista(QMainWindow):
             self.sliderKernel.hide()
             self.labelKernel.hide()
 
+    def actualizarImagenMostrada(self):
+    
+        if self.imagen_procesada is None:
+            return 
+        if self.checkboxMostrar.isChecked():
+            self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
+        else:
+            self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")
