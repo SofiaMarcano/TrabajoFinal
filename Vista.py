@@ -945,7 +945,7 @@ class TablaCSV(QMainWindow):
             # Conexiones
             btnGuardar.clicked.connect(lambda: self.__accionGuardarImagen(fig,dialog))
             btnVolver.clicked.connect(dialog.accept)
-            btnCerrar.clicked.connect(self.__accionCerrarTodo)
+            btnCerrar.clicked.connect(self.__accionCerrarTodo(dialog))
 
             # Cerrar la ventana de tabla (self) mientras se abre esta
             self.hide()
@@ -1034,8 +1034,8 @@ class TablaCSV(QMainWindow):
 
         # Quitar después de 3 segundos
         QTimer.singleShot(3000, toast.close)
-    def __accionCerrarTodo(self):
-        self.close()
+    def __accionCerrarTodo(self,dialog):
+        dialog.accept()
         if self.ventana:
             self.ventana.show()
 
