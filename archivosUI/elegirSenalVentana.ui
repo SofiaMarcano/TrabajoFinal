@@ -21,6 +21,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#centralwidget {
+	background-image: url(:/1/tv.png);
     border-image: url(&quot;:/1/tv.png&quot;) 0 0 0 0 stretch stretch;
 	background-color: transparent;
 }
@@ -91,7 +92,7 @@
         </spacer>
        </item>
        <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-        <widget class="QLabel" name="seleccionetexto">
+        <widget class="QLabel" name="seleccioneTexto">
          <property name="styleSheet">
           <string notr="true">QLabel {
 
@@ -123,7 +124,7 @@
         </spacer>
        </item>
        <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-        <widget class="QPushButton" name="abriSenal">
+        <widget class="QPushButton" name="abrirSenal">
          <property name="styleSheet">
           <string notr="true">QPushButton {
     background-color: white;
@@ -180,19 +181,6 @@ QPushButton:pressed {
            </property>
           </spacer>
          </item>
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
          <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
           <widget class="QLabel" name="seleccionetexto_2">
            <property name="maximumSize">
@@ -219,7 +207,46 @@ QPushButton:pressed {
           </widget>
          </item>
          <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+          <widget class="QComboBox" name="comboBoxDBMAT">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12pt;
+}
+
+QComboBox:hover {
+    border: 1px solid #3498db;
+}
+
+
+</string>
+           </property>
+          </widget>
+         </item>
+         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
           <widget class="QPushButton" name="cargarMAT">
+           <property name="minimumSize">
+            <size>
+             <width>79</width>
+             <height>33</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>79</width>
+             <height>33</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">QPushButton {
     background-color: white;
@@ -244,7 +271,7 @@ QPushButton:pressed {
 </string>
            </property>
            <property name="text">
-            <string>Cargar...</string>
+            <string>Cargar</string>
            </property>
           </widget>
          </item>

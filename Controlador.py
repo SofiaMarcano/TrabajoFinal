@@ -1,4 +1,3 @@
-
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect
 from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
@@ -7,9 +6,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import os
-
-# from Vista import ImagenVista
-from Vista import senales_tabla_menu_Vista,CCSV,TablaCSV
+from Vista import senalesMenuVista,CCSV,TablaCSV
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
@@ -20,6 +17,8 @@ class LoginControlador:
         self._cargadoDesdeBase = False
 
         self.vista.boton_login.clicked.connect(self.ver_login) ## Conectar el botón de login con el método que valida el acceso
+
+##########################################LOGIN###############################################################
 
     def ver_login(self):
         self.vista.espera()
@@ -61,7 +60,7 @@ class LoginControlador:
             # self.panel = ImagenVista()
             pass
         elif tipo == "senal":
-            self.panel = senales_tabla_menu_Vista(self.vista)
+            self.panel = senalesMenuVista(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
 
@@ -171,22 +170,19 @@ class LoginControlador:
         self.vista.show()
 
 
-    ############MAT############
+####################################################MAT#########################################################
 
     def recibirRuta(self,ruta):
         self.modelo.recibirRuta(ruta)
     
-    def dLlaves(self):
+    def llevarLlaves(self):
         return self.modelo.devolverLlaves()
     
     def verificarLlave(self,llave):
         return self.modelo.verLlave(llave)
     
-    def dDatos(self, llave):
+    def llevarDatos(self, llave):
         return self.modelo.devolverData(llave)
-    
-    def rDatos(self,d):
-        self.modelo.recibirDatos(d)
 
     def devolverDatosSenal(self,min,max,c=None):
         return self.modelo.devolverSegmento(min, max,c)
@@ -194,10 +190,8 @@ class LoginControlador:
     def devolverDatosSenalProm(self, a, c):
         return self.modelo.dDatosSenalProm(a, c)
     
-
-    def getEstSenal(self, c):
+    def getEstSenal(self, c=0):
         return self.modelo.getEst(c)
-    
 
     def llevarFiltro(self,s, fs=1000, fc=10):
         return self.modelo.filtroSenal(s, fs, fc)
@@ -222,8 +216,10 @@ class LoginControlador:
             print("Error al guardar gráfico:", e)
             return False
             
+    def listarMATs(self):
+        return self.modelo.listarMATs()
     
-    #######CSV########
+####################################################CSV######################################################
 
     def setCargadoDesdeBase(self, valor: bool):
         self._cargadoDesdeBase = valor
@@ -241,6 +237,7 @@ class LoginControlador:
 
     def getRutaCSV(self):
         return self._rutaCSV
+    
     def cargarCSVporID(self, id_archivo):
         datos, columnas = self.modelo.cargarCSVporID(id_archivo)
         if datos is None or columnas is None:
@@ -259,6 +256,7 @@ class LoginControlador:
 
     def listarCSVs(self):
         return self.modelo.listarCSVs()
+    
     def TablaEnNueva(self,datos,columnas):
         import os
         if self._rutaCSV:
@@ -276,6 +274,7 @@ class LoginControlador:
         )
         self.vistaTabla.show()
         self.vistaTabla.show()
+        
     def guardarCSV(self, nombre, ruta):
         resultado = self.modelo.guardarCSV(nombre, ruta)
         return resultado

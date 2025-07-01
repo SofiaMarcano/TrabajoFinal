@@ -2,6 +2,8 @@ from pymongo import MongoClient
 import datetime
 import pandas as pd
 class ConexionMongo:
+
+############################################LOGIN#######################################
     def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
         self.__cliente = MongoClient(uri)
         self.__db = self.__cliente[db_nombre]
@@ -75,6 +77,8 @@ class ConexionMongo:
             "exito": False,
             "fecha": {"$gte": limite} #La fecha es mayor o igual a limite
         })
+    
+######################################CSV############################################
     def guardar_csv(self, nombre_archivo, ruta_archivo):
         # Verificar si ya existe esa ruta
         existente = self.__db["registro_archivos"].find_one({
@@ -111,5 +115,10 @@ class ConexionMongo:
         return doc["ruta"]
 
     
-
+#######################################MAT####################################
+    def listar_mats(self):
+        cursor = self.__db["registro_archivos"].find({"tipo_archivo": "mat"})
+        lista = list(cursor)
+        print(f"Listados {len(lista)} MAT en base de datos.")
+        return lista
 
