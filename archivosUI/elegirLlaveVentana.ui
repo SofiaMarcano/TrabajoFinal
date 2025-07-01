@@ -21,6 +21,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QWidget#centralwidget {
+	background-image: url(:/1/tv.png);
     border-image: url(&quot;:/1/tv.png&quot;) 0 0 0 0 stretch stretch;
 	background-color: transparent;
 }
@@ -227,8 +228,7 @@ QPushButton:pressed {
   </widget>
  </widget>
  <resources>
-  <include location="../Imagenes/bgPrueba.qrc"/>
-  <include location="../fuentes/fuentes.qrc"/>
+  <include location="../Img/bgPrueba.qrc"/>
  </resources>
  <connections/>
 </ui>
