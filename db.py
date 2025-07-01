@@ -1,7 +1,9 @@
 from pymongo import MongoClient
 import datetime
-
+import pandas as pd
 class ConexionMongo:
+
+############################################LOGIN#######################################
     def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
         self.__cliente = MongoClient(uri)
         self.__db = self.__cliente[db_nombre]
@@ -55,9 +57,9 @@ class ConexionMongo:
                 {
                     "id": "ARCH002",
                     "tipo_archivo": "csv",
-                    "nombre_archivo": "datos.csv",
+                    "nombre_archivo": "brain_stoke",
                     "fecha": "20/07/2022",
-                    "ruta": r"C:/archivos/datos.csv"
+                    "ruta": r"ArchivosCSV\brain_stroke.csv"
                 }
             ])
         return m
@@ -75,7 +77,5 @@ class ConexionMongo:
             "exito": False,
             "fecha": {"$gte": limite} #La fecha es mayor o igual a limite
         })
-    
     def guardar_estudio(self, info_dict):
-        self.__db["estudios"].insert_one(info_dict)
-
+            self.__db["estudios"].insert_one(info_dict)
