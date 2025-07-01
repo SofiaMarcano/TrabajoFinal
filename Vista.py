@@ -795,7 +795,7 @@ class TablaCSV(QMainWindow):
         self.botonGraficar = QPushButton("Graficar dispersión")
         self.layout.addWidget(self.botonGraficar)
 
-        self.botonGuardar = QPushButton("Guardar en Base")
+        self.botonGuardar = QPushButton("Guardar en Base de Datos")
         self.botonGuardar.setEnabled(not self.desdeBase)
         self.layout.addWidget(self.botonGuardar)
 
