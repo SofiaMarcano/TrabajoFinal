@@ -4,6 +4,8 @@ from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
 from PyQt5.QtCore import Qt,QTimer
 from PyQt5.uic import loadUi
 from Imagenes import bgPrueba_rc
+from PyQt5.QtGui import QImage, QPixmap
+import numpy as np
 
 # vista/login_vista.py
 # from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QCheckBox
@@ -183,7 +185,6 @@ class elegirSenalVentana(QMainWindow):
             self.seleccionetexto.setText("Señal no válida")
             self.seleccionetexto.repaint()
 
-            
 
 class ElegirLlave(QMainWindow):
     pass

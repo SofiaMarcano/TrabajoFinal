@@ -75,3 +75,7 @@ class ConexionMongo:
             "exito": False,
             "fecha": {"$gte": limite} #La fecha es mayor o igual a limite
         })
+    
+    def guardar_estudio(self, info_dict):
+        self.__db["estudios"].insert_one(info_dict)
+
