@@ -137,6 +137,7 @@ class LoginVista(QWidget):
             self.input_password.setEchoMode(QLineEdit.Normal)
         else:
             self.input_password.setEchoMode(QLineEdit.Password)
+    
 
 ###########################################EXPERTO EN SEÑALES MENU###########################################
 class senalesMenuVista(QMainWindow):
@@ -540,9 +541,10 @@ class senalVista(QMainWindow):
 
 ###################################################CSV##############################################################
 class CCSV(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None,ventana=None):
         super().__init__(parent)
-        self.parent = parent
+        self.parent= parent
+        self.ventana=ventana
         self.__controlador = None
 
         self.setWindowTitle("🐱 Cargar Datos Tabulares (.csv)")
@@ -598,7 +600,7 @@ class CCSV(QMainWindow):
 
         # Selector de CSV guardados en base
         self.comboDB = QComboBox()
-        self.botonCargarDB = QPushButton("⬇Cargar de DB")
+        self.botonCargarDB = QPushButton("Cargar de DB")
         self.botonCargarDB.setCursor(QCursor(Qt.PointingHandCursor))
 
         # Botón para visualizar
@@ -673,9 +675,15 @@ class CCSV(QMainWindow):
                 self.labelEstado.setText("Archivo CSV cargado desde disco.")
                 self.labelEstado.setStyleSheet("color: #44DD44; font-weight: bold;")
                 self.__controlador.setCargadoDesdeBase(False)
-            else:
-                self.labelEstado.setText("Error al cargar el CSV.")
-                self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
+                nombre_archivo = os.path.basename(a)
+                self.__controlador.setNombreCSV(nombre_archivo)
+
+                # ✅ Abrir TablaCSV con este CSV
+                datos, columnas = self.__controlador.getDatosColumnas()
+
+                # ✅ Cerrar la ventana actual (CCSV)
+                self.close()
+                self.__controlador.TablaEnNueva(datos, columnas,parent=self,ventana=self.parent)
         else:
             self.labelEstado.setText("Selección cancelada.")
             self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
@@ -691,20 +699,30 @@ class CCSV(QMainWindow):
             return
 
         resultado = self.__controlador.cargarCSVporID(id_archivo)
-        if resultado == "OK":
-            self.labelEstado.setText(f"Archivo CSV cargado desde base (ID: {id_archivo}).")
-            self.labelEstado.setStyleSheet("color: #44DD44; font-weight: bold;")
-            self.__controlador.setCargadoDesdeBase(True)
-        else:
+        if resultado == "ERROR":
             self.labelEstado.setText("Error al cargar desde base.")
             self.labelEstado.setStyleSheet("color: #FF5555; font-weight: bold;")
+            return
+
+        nombre_archivo, datos, columnas = resultado
+
+        self.labelEstado.setText(f"Archivo CSV cargado desde base (ID: {id_archivo}).")
+        self.labelEstado.setStyleSheet("color: #44DD44; font-weight: bold;")
+
+    
+        self.__controlador.setNombreCSV(nombre_archivo)
+        self.__controlador.setCargadoDesdeBase(True)
+
+        self.close()
+        self.__controlador.TablaEnNueva(datos, columnas, parent=self,ventana=self.parent)
+
 
     def seeTabla(self):
         if self.__controlador:
             datos = self.__controlador.obtenerDatosCSV()
             columnas = self.__controlador.obtenerColumnasCSV()
             if datos is not None:
-                self.__controlador.TablaEnNueva(datos, columnas)
+                self.__controlador.TablaEnNueva(datos, columnas,parent=self,ventana=self.parent)
             else:
                 QMessageBox.warning(self, "Error", "No hay datos cargados.")
         else:
@@ -716,10 +734,11 @@ class CCSV(QMainWindow):
             self.parent.show()
 
 class TablaCSV(QMainWindow):
-    def __init__(self, datos, columnas=None, parent=None, controlador=None, desdeBase=False,nombreCSV="grafico"):
+    def __init__(self, datos, columnas=None, parent=None, controlador=None, desdeBase=False,nombreCSV="grafico",ventana=None):
         super().__init__(parent)
         self.parent = parent
         self.datos = datos
+        self.ventana=ventana
         self.columnas = columnas
         self.__controlador = controlador
         self.desdeBase = desdeBase
@@ -875,31 +894,53 @@ class TablaCSV(QMainWindow):
             nombre_colX = self.comboX.currentText()
             nombre_colY = self.comboY.currentText()
             plt.tight_layout()
-            plt.show()
-            def preguntar_guardar():
-                reply = QMessageBox.question(
-                    self,
-                    "Guardar imagen",
-                    "¿Deseas guardar este gráfico como imagen?",
-                    QMessageBox.Yes | QMessageBox.No
-                )
-                if reply == QMessageBox.Yes:
-                    # Crear carpeta
-                    carpeta = "img"
-                    os.makedirs(carpeta, exist_ok=True)
+            # --- NUEVA VENTANA DE DIÁLOGO ---
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Vista previa del gráfico")
+            dialog.setFixedSize(700, 500)
+            dialog.setStyleSheet("""
+                QDialog {
+                    background-color: #1E1E2F;
+                }
+                QPushButton {
+                    background-color: #00A8CC;
+                    color: white;
+                    border-radius: 8px;
+                    padding: 10px;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                QPushButton:hover {
+                    background-color: #007EA7;
+                }
+            """)
 
-                    # Nombre base
-                    base_nombre = self.nombreCSV.replace(" ", "_")
-                    nombre_colX_clean = nombre_colX.replace(" ", "_")
-                    nombre_colY_clean = nombre_colY.replace(" ", "_")
-                    archivo_nombre = f"{base_nombre}_{nombre_colX_clean}_vs_{nombre_colY_clean}.png"
-                    ruta_completa = os.path.join(carpeta, archivo_nombre)
+            layout = QVBoxLayout()
+            canvas = FigureCanvas(fig)
+            layout.addWidget(canvas)
 
-                    # Guardar
-                    fig.savefig(ruta_completa)
-                    QMessageBox.information(self, "Guardado", f"Imagen guardada en:\n{ruta_completa}")
+            # Botones
+            botones = QHBoxLayout()
+            btnGuardar = QPushButton("Guardar ")
+            btnVolver = QPushButton("Volver")
+            btnCerrar = QPushButton("Cerrar")
 
-            QTimer.singleShot(5000, preguntar_guardar)
+            botones.addWidget(btnGuardar)
+            botones.addWidget(btnVolver)
+            botones.addWidget(btnCerrar)
+            layout.addLayout(botones)
+
+            dialog.setLayout(layout)
+
+            # Conexiones
+            btnGuardar.clicked.connect(lambda: self.__accionGuardarImagen(fig,dialog))
+            btnVolver.clicked.connect(dialog.accept)
+            btnCerrar.clicked.connect(self.__accionCerrarTodo)
+
+            # Cerrar la ventana de tabla (self) mientras se abre esta
+            self.hide()
+            dialog.exec_()
+            self.show()
         except Exception as e:
             print("Error al graficar:", e)
 
@@ -925,17 +966,69 @@ class TablaCSV(QMainWindow):
             return
 
         ruta_csv = self.__controlador.getRutaCSV()
-        nombre_archivo = os.path.basename(ruta_csv)  # Obtener solo el nombre del archivo
+        ruta_rel = os.path.relpath(ruta_csv)
+        nombre_archivo = os.path.basename(ruta_rel)  # Obtener solo el nombre del archivo
 
-        exito = self.__controlador.guardarCSV(nombre_archivo, ruta_csv)
+        exito = self.__controlador.guardarCSV(nombre_archivo, ruta_rel)
         if exito:
             QMessageBox.information(self, "Guardado", f"CSV '{nombre_archivo}' guardado en base de datos.")
         else:
             QMessageBox.warning(self, "Duplicado", f"Ya existe un registro con la ruta '{ruta_csv}' en la base de datos.")
     def volver(self):
         self.close()
-        if self.parent:
-            self.parent.show()
+        if self.ventana:
+            self.ventana.show()
+    def __accionGuardarImagen(self, fig,dialog):
+        try:
+            # Crear carpeta si no existe
+            carpeta = "img"
+            os.makedirs(carpeta, exist_ok=True)
+
+            # Limpiar nombres
+            nombre_archivo_base = self.nombreCSV.replace(" ", "_")
+            nombre_colX = self.comboX.currentText().replace(" ", "_")
+            nombre_colY = self.comboY.currentText().replace(" ", "_")
+
+            # Construir nombre del archivo
+            archivo_nombre = f"{nombre_archivo_base}_{nombre_colX}vs{nombre_colY}.png"
+            ruta_completa = os.path.join(carpeta, archivo_nombre)
+
+            # Guardar la figura
+            fig.savefig(ruta_completa)
+            self.__mostrarToast("Imagen guardada correctamente en img/")
+            QTimer.singleShot(3000, lambda: self.__volverDesdeToast(dialog))
+        except Exception as e:
+            QMessageBox.warning(self, "Error al guardar imagen", str(e))
+    def __volverDesdeToast(self, dialog):
+        dialog.accept()
+        self.show()
+
+    def __mostrarToast(self, mensaje):
+        # Crear un QLabel temporal
+        toast = QLabel(mensaje, self)
+        toast.setStyleSheet("""
+            background-color: #323232;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+        """)
+        toast.setWindowFlags(Qt.ToolTip)
+
+        # Centrarlo o ponerlo abajo
+        toast.adjustSize()
+        x = (self.width() - toast.width()) // 2
+        y = self.height() - toast.height() - 30
+        toast.move(x, y)
+        toast.show()
+
+        # Quitar después de 3 segundos
+        QTimer.singleShot(3000, toast.close)
+    def __accionCerrarTodo(self):
+        self.close()
+        if self.ventana:
+            self.ventana.show()
+
 class EstadisticaDialog(QDialog):
     def __init__(self, columnas, parent=None):
         super().__init__(parent)

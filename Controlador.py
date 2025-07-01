@@ -230,6 +230,9 @@ class LoginControlador:
 
     def setCargadoDesdeBase(self, valor: bool):
         self._cargadoDesdeBase = valor
+    def setNombreCSV(self, nombre_csv):
+        self._nombreCSV = nombre_csv
+
     
     def procesarCSV(self, ruta):
         try:
@@ -246,14 +249,18 @@ class LoginControlador:
         return os.path.relpath(self._rutaCSV)
     
     def cargarCSVporID(self, id_archivo):
-        datos, columnas = self.modelo.cargarCSVporID(id_archivo)
-        if datos is None or columnas is None:
+        nombre, datos, columnas = self.modelo.cargarCSVporID(id_archivo)
+        if nombre is None or datos is None or columnas is None:
             return "ERROR"
+
         self._datosCSV = datos
         self._columnasCSV = columnas
+        self._nombreCSV = nombre
         self._cargadoDesdeBase = True
-        print(f"CSV cargado desde base (ID: {id_archivo})")
-        return "OK"
+
+        print(f"✅ CSV cargado desde base (ID: {id_archivo}), nombre: {nombre}")
+        return (nombre, datos, columnas)
+
 
     def obtenerDatosCSV(self):
         return self._datosCSV
@@ -264,26 +271,31 @@ class LoginControlador:
     def listarCSVs(self):
         return self.modelo.listarCSVs()
     
-    def TablaEnNueva(self,datos,columnas):
+    def TablaEnNueva(self,datos,columnas,parent,ventana):
         import os
-        if self._rutaCSV:
-            nombre_csv_base = os.path.basename(self._rutaCSV)
-            nombre_csv_base = os.path.splitext(nombre_csv_base)[0]
+        if self._nombreCSV:
+            nombre_csv_base = os.path.splitext(os.path.basename(self._nombreCSV))[0]
+        elif self._rutaCSV:
+            nombre_csv_base = os.path.splitext(os.path.basename(self._rutaCSV))[0]
+
         else:
             nombre_csv_base = "grafico"
 
         self.vistaTabla = TablaCSV(
             datos, columnas,
-            parent=self.vista,
+            parent=parent,
             controlador=self,
             desdeBase=self._cargadoDesdeBase,
-            nombreCSV=nombre_csv_base
+            nombreCSV=nombre_csv_base,
+            ventana=ventana
         )
         self.vistaTabla.show()
         
     def guardarCSV(self, nombre, ruta):
         resultado = self.modelo.guardarCSV(nombre, ruta)
         return resultado
+    def getDatosColumnas(self):
+        return self._datosCSV, self._columnasCSV
 
 
 

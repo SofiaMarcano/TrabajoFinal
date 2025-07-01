@@ -112,7 +112,7 @@ class ConexionMongo:
         doc = self.__db["registro_archivos"].find_one({"id": id_archivo})
         if not doc:
             return None
-        return doc["ruta"]
+        return doc
 
     
 #######################################MAT####################################

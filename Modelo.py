@@ -93,18 +93,21 @@ class ModeloBase:
         return self.__conexion.listar_csvs()
 
     def cargarCSVporID(self, id_archivo):
-        ruta = self.__conexion.obtener_csv_por_id(id_archivo)
-        if ruta is None:
-            return "ERROR"
+        registro = self.__conexion.obtener_csv_por_id(id_archivo)
+        if registro is None:
+            return None, None, None
+
+        ruta = registro["ruta"]
+        nombre_archivo = registro["nombre_archivo"]
 
         try:
             df = pd.read_csv(ruta)
             columnas = list(df.columns)
             datos = df.to_numpy()
-            return datos, columnas
+            return nombre_archivo, datos, columnas
         except Exception as e:
             print(f"Error al leer CSV desde ruta guardada: {e}")
-            return "ERROR"
+            return None, None, None
 
 
 
