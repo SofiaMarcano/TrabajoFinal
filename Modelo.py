@@ -8,7 +8,7 @@ import pandas as pd
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
-
+        
 ############################################LOGIN###################################################
     def val_usuario(self, usuario, password):
         return self.__conexion.verf_usu(usuario, password)
