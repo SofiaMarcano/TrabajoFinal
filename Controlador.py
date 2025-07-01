@@ -219,6 +219,13 @@ class LoginControlador:
     def listarMATs(self):
         return self.modelo.listarMATs()
     
+    def devolverRutaMAT(self):
+        return self.modelo.verRutaMAT()
+    
+    def guardarBD(self, nombre, ruta):
+        resultado = self.modelo.guardarMAT(nombre, ruta)
+        return resultado
+    
 ####################################################CSV######################################################
 
     def setCargadoDesdeBase(self, valor: bool):
@@ -272,7 +279,6 @@ class LoginControlador:
             desdeBase=self._cargadoDesdeBase,
             nombreCSV=nombre_csv_base
         )
-        self.vistaTabla.show()
         self.vistaTabla.show()
         
     def guardarCSV(self, nombre, ruta):

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import scipy.io as sio
 from scipy.signal import butter, filtfilt
@@ -19,7 +20,6 @@ class ModeloBase:
 #############################################MAT#####################################################
     def recibirRuta(self,ruta):
         self.__rutaMAT = ruta
-        print("RUTA EN MODELO: "+ self.__rutaMAT)
 
     def devolverLlaves(self):
         self.__archivo = sio.loadmat(self.__rutaMAT)
@@ -78,6 +78,12 @@ class ModeloBase:
     
     def listarMATs(self):
         return self.__conexion.listar_mats()
+    
+    def verRutaMAT(self):
+        return os.path.relpath(self.__rutaMAT)
+    
+    def guardarMAT(self, nombre, ruta):
+        return self.__conexion.guardar_mat(nombre, ruta)
     
 ##################################################CSV################################################
     def guardarCSV(self, nombre, ruta):

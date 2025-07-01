@@ -121,4 +121,25 @@ class ConexionMongo:
         lista = list(cursor)
         print(f"Listados {len(lista)} MAT en base de datos.")
         return lista
+    
+    def guardar_mat(self, nombre_archivo, ruta_archivo):
+        existente = self.__db["registro_archivos"].find_one({
+            "tipo_archivo": "mat",
+            "ruta": ruta_archivo
+        })
+
+        if existente:
+            print(f"⚠️ Ya existe en la base de datos con ruta: {ruta_archivo}")
+            return False
+
+        registro = {
+            "id": "ARCH" + str(self.__db["registro_archivos"].count_documents({}) + 1).zfill(3),
+            "tipo_archivo": "mat",
+            "nombre_archivo": nombre_archivo,
+            "fecha": datetime.datetime.now().strftime("%d/%m/%Y"),
+            "ruta": ruta_archivo
+        }
+        self.__db["registro_archivos"].insert_one(registro)
+        print(f"Insertado nuevo MAT en base con ruta: {ruta_archivo}")
+        return True
 

@@ -414,6 +414,7 @@ class senalVista(QMainWindow):
 
     def setControlador(self,c):
         self.__controlador = c
+        self.guardarEnBase()
 
 
     def cargarDatos(self,llave):
@@ -428,7 +429,7 @@ class senalVista(QMainWindow):
         self.shapeTexto.repaint()
         self.spinBox.setMaximum(self.__c)
         self.spinBoxCanal.setMaximum(self.__c)
-        self.epocaSpinbox.setMaximun(self.__e)
+        self.epocaSpinbox.setMaximum(self.__e)
         self.spinBox.setValue(self.__c)
         #fm = frecuencia muestreo, fc = frecuencia corte
         #valores predeterminados
@@ -515,8 +516,23 @@ class senalVista(QMainWindow):
             self.guardarTexto.repaint()
 
     def volverMenu(self):
+        self.parent.listarLlaves()
         self.close()
         self.parent.show()
+
+
+    def guardarEnBase(self):
+        if not self.__controlador or not self.__controlador.devolverRutaMAT():
+            QMessageBox.warning(self, "Error", "No se conoce la ruta del archivo MAT original.")
+            return
+
+        ruta_mat = self.__controlador.devolverRutaMAT()
+        nombre_archivo = os.path.basename(ruta_mat)
+        exito = self.__controlador.guardarBD(nombre_archivo, ruta_mat)
+        if exito:
+            QMessageBox.information(self, "Guardado", f"MAT '{nombre_archivo}' guardado en base de datos.")
+        else:
+            QMessageBox.warning(self, "Duplicado", f"Ya existe un registro con la ruta '{ruta_mat}' en la base de datos.")
 
 ###################################################CSV##############################################################
 class CCSV(QMainWindow):
@@ -524,6 +540,7 @@ class CCSV(QMainWindow):
         super().__init__(parent)
         self.parent = parent
         self.__controlador = None
+        self.__controlador.setParent(self)
 
         self.setWindowTitle("🐱 Cargar Datos Tabulares (.csv)")
         self.setGeometry(450, 200, 600, 400)
@@ -634,6 +651,7 @@ class CCSV(QMainWindow):
 
     def setControlador(self, c):
         self.__controlador = c
+        self.__controlador.vista = self
         if self.__controlador:
             # Al asignar el controlador, pedirle los CSV guardados
             lista = self.__controlador.listarCSVs()
@@ -897,6 +915,7 @@ class TablaCSV(QMainWindow):
             QMessageBox.information(self, "Suma de columnas", texto)
         except Exception as e:
             print("Error en suma:", e)
+            
     def guardarEnBase(self):
         if not self.__controlador or not self.__controlador.getRutaCSV():
             QMessageBox.warning(self, "Error", "No se conoce la ruta del archivo CSV original.")
