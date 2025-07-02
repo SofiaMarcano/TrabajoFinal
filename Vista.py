@@ -23,7 +23,13 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtGui import QMovie, QFont
 from PyQt5.QtWidgets import QGraphicsOpacityEffect
 
+import os
+from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal, QPropertyAnimation, QEasingCurve
+from PyQt5.QtGui import QFont, QMovie
+from PyQt5.QtWidgets import QGraphicsOpacityEffect
 
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 class Loro(QWidget):
     terminado = pyqtSignal()
 
@@ -87,17 +93,23 @@ class Loro(QWidget):
         self.btnSkip.setVisible(False)
         layout.addWidget(self.btnSkip)
         self.btnSkip.clicked.connect(self.skipIntroduccion)
-        QTimer.singleShot(5000, self.mostrarBoton)
 
         # Música de fondo
         self.player = QMediaPlayer()
+        self.playlist = QMediaPlaylist()
         music_path = os.path.abspath(r"Img\Lava_Chicken.wav")
-        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(music_path)))
-        self.player.setVolume(200)
+        self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(music_path)))
+        self.playlist.setPlaybackMode(QMediaPlaylist.CurrentItemOnce)
+        self.player.setPlaylist(self.playlist)
+        self.player.setVolume(100)
 
+        # 📡 Conexiones
+        self.player.stateChanged.connect(self._estado_cambiado)
         self.player.play()
-        self.player.mediaStatusChanged.connect(self.verificarFinMusica)
-
+    def _estado_cambiado(self, state):
+        if state == QMediaPlayer.PlayingState:
+            self.show()
+            QTimer.singleShot(5000, self.mostrarBoton)
     def mostrarBoton(self):
         self.btnSkip.setVisible(True)
 
