@@ -15,6 +15,12 @@ from PyQt5.QtWidgets import (
 )
 from Img import bgPrueba_rc
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+import os
+from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal, QPropertyAnimation, QEasingCurve
+from PyQt5.QtGui import QFont, QMovie
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QGraphicsOpacityEffect
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+
 class Loro(QWidget):
     terminado = pyqtSignal()
 
@@ -23,7 +29,7 @@ class Loro(QWidget):
         self.setWindowTitle("🦜🐱🦋🦎Introducción - LoroBytes")
         self.setFixedSize(600, 400)
 
-        # Tema oscuro con azul cian
+        # 🌙 Tema oscuro con azul cian
         self.setStyleSheet("""
             QWidget {
                 background-color: #1a1a2e;
@@ -45,16 +51,13 @@ class Loro(QWidget):
             }
         """)
 
-        # Layout vertical
+        # 📦 Layout vertical
         layout = QVBoxLayout(self)
 
-        # Nombre de la empresa con opacidad animada
         self.labelNombre = QLabel("LoroBytes")
         self.labelNombre.setAlignment(Qt.AlignCenter)
         self.labelNombre.setFont(QFont("Arial", 32, QFont.Bold))
         layout.addWidget(self.labelNombre)
-
-        # Efecto de opacidad
         self.opacity_effect = QGraphicsOpacityEffect()
         self.labelNombre.setGraphicsEffect(self.opacity_effect)
         self.animacion_opacidad = QPropertyAnimation(self.opacity_effect, b"opacity")
@@ -62,24 +65,19 @@ class Loro(QWidget):
         self.animacion_opacidad.setStartValue(0.2)
         self.animacion_opacidad.setEndValue(1.0)
         self.animacion_opacidad.setEasingCurve(QEasingCurve.InOutQuad)
-        self.animacion_opacidad.setLoopCount(-1)  # Infinite loop
+        self.animacion_opacidad.setLoopCount(-1)
         self.animacion_opacidad.start()
-
-        # Loro animado (GIF)
         self.labelLoro = QLabel()
         self.labelLoro.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.labelLoro)
         self.movie = QMovie(r"Img\loroRojo.gif")
         self.labelLoro.setMovie(self.movie)
         self.movie.start()
-
-        # Botón Skip
         self.btnSkip = QPushButton("Skip")
         self.btnSkip.setVisible(False)
         layout.addWidget(self.btnSkip)
         self.btnSkip.clicked.connect(self.skipIntroduccion)
 
-        # Música de fondo
         self.player = QMediaPlayer()
         self.playlist = QMediaPlaylist()
         music_path = os.path.abspath(r"Img\Lava_Chicken.wav")
@@ -87,20 +85,28 @@ class Loro(QWidget):
         self.playlist.setPlaybackMode(QMediaPlaylist.CurrentItemOnce)
         self.player.setPlaylist(self.playlist)
         self.player.setVolume(100)
-
-        # 📡 Conexiones
         self.player.stateChanged.connect(self._estado_cambiado)
+        self.player.mediaStatusChanged.connect(self.verificarFinMusica)
+        self.player.error.connect(lambda e: print("[ERROR]", self.player.errorString()))
+
+        # 🔊 Empieza a cargar y reproducir
         self.player.play()
+
     def _estado_cambiado(self, state):
+
         if state == QMediaPlayer.PlayingState:
             self.show()
             QTimer.singleShot(5000, self.mostrarBoton)
-    def mostrarBoton(self):
-        self.btnSkip.setVisible(True)
+
+        elif state == QMediaPlayer.StoppedState:
+            self.irLogin()
 
     def verificarFinMusica(self, status):
         if status == QMediaPlayer.EndOfMedia:
             self.irLogin()
+
+    def mostrarBoton(self):
+        self.btnSkip.setVisible(True)
 
     def skipIntroduccion(self):
         self.player.stop()
@@ -110,6 +116,7 @@ class Loro(QWidget):
         self.player.stop()
         self.terminado.emit()
         self.close()
+
 
 #########################################LOGIN#############################################
 class LoginVista(QWidget):
