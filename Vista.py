@@ -1036,11 +1036,9 @@ class TablaCSV(QMainWindow):
             botones = QHBoxLayout()
             btnGuardar = QPushButton("Guardar ")
             btnVolver = QPushButton("Volver")
-            btnCerrar = QPushButton("Cerrar")
 
             botones.addWidget(btnGuardar)
             botones.addWidget(btnVolver)
-            botones.addWidget(btnCerrar)
             layout.addLayout(botones)
 
             dialog.setLayout(layout)
@@ -1048,7 +1046,6 @@ class TablaCSV(QMainWindow):
             # Conexiones
             btnGuardar.clicked.connect(lambda: self.__accionGuardarImagen(fig,dialog))
             btnVolver.clicked.connect(dialog.accept)
-            btnCerrar.clicked.connect(lambda: self.__accionCerrarTodo(dialog))
 
             # Cerrar la ventana de tabla (self) mientras se abre esta
             self.hide()
@@ -1139,6 +1136,7 @@ class TablaCSV(QMainWindow):
         QTimer.singleShot(3000, toast.close)
     def __accionCerrarTodo(self,dialog):
         dialog.accept()
+        self.hide()
         if self.ventana:
             self.ventana.show()
 
