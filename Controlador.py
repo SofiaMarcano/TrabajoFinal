@@ -5,16 +5,11 @@ from PyQt5.QtMultimedia import QSound
 import pandas as pd
 import numpy as np
 import os
-<<<<<<< HEAD
-import datetime
-from Vista import senalesMenuVista,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
-=======
 from datetime import datetime
 
 # from Vista import ImagenVista
 from Vista import senalesMenuVista ,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
 
->>>>>>> 9ed3b9e5e897cad2d20a6bb97a9fe8e3e4811673
 class LoginControlador:
     def __init__(self, vista, modelo):
         self.vista = vista
