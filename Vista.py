@@ -762,7 +762,7 @@ class CCSV(QMainWindow):
 
     def setControlador(self, c):
         self.__controlador = c
-        self.__controlador.vista = self
+        # self.__controlador.vista = self
         if self.__controlador:
             # Al asignar el controlador, pedirle los CSV guardados
             lista = self.__controlador.listarCSVs()
@@ -1041,7 +1041,7 @@ class TablaCSV(QMainWindow):
             # Conexiones
             btnGuardar.clicked.connect(lambda: self.__accionGuardarImagen(fig,dialog))
             btnVolver.clicked.connect(dialog.accept)
-            btnCerrar.clicked.connect(self.__accionCerrarTodo(dialog))
+            btnCerrar.clicked.connect(lambda: self.__accionCerrarTodo(dialog))
 
             # Cerrar la ventana de tabla (self) mientras se abre esta
             self.hide()
