@@ -57,6 +57,7 @@ class LoginControlador:
 
         finally:
             self.vista.normal()
+            
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
