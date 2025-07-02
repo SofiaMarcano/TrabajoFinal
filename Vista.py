@@ -1,9 +1,8 @@
 import numpy as np
 import os
 import cv2
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator
-from PyQt5.QtCore import Qt,QTimer
+from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator, QMovie
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QUrl, QEasingCurve, QPropertyAnimation
 from PyQt5.uic import loadUi
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -11,24 +10,10 @@ import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout,
     QHBoxLayout, QWidget, QFileDialog, QMessageBox,QFrame, QCheckBox, QSizePolicy,
-    QTableWidget, QSlider, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout
+    QTableWidget, QSlider, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout,
+    QGraphicsOpacityEffect
 )
 from Img import bgPrueba_rc
-
-
-import os
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QUrl, QEasingCurve, QPropertyAnimation
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtGui import QMovie, QFont
-from PyQt5.QtWidgets import QGraphicsOpacityEffect
-
-import os
-from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui import QFont, QMovie
-from PyQt5.QtWidgets import QGraphicsOpacityEffect
-
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 class Loro(QWidget):
     terminado = pyqtSignal()
