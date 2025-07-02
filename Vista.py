@@ -15,6 +15,105 @@ from PyQt5.QtWidgets import (
 )
 from Img import bgPrueba_rc
 
+
+import os
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QUrl, QEasingCurve, QPropertyAnimation
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtGui import QMovie, QFont
+from PyQt5.QtWidgets import QGraphicsOpacityEffect
+
+
+class Loro(QWidget):
+    terminado = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("🦜🐱🦋🦎Introducción - LoroBytes")
+        self.setFixedSize(600, 400)
+
+        # Tema oscuro con azul cian
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a1a2e;
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #00c6ff;
+                color: #ffffff;
+                border: none;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #33d6ff;
+            }
+            QLabel {
+                color: #ffffff;
+            }
+        """)
+
+        # Layout vertical
+        layout = QVBoxLayout(self)
+
+        # Nombre de la empresa con opacidad animada
+        self.labelNombre = QLabel("LoroBytes")
+        self.labelNombre.setAlignment(Qt.AlignCenter)
+        self.labelNombre.setFont(QFont("Arial", 32, QFont.Bold))
+        layout.addWidget(self.labelNombre)
+
+        # Efecto de opacidad
+        self.opacity_effect = QGraphicsOpacityEffect()
+        self.labelNombre.setGraphicsEffect(self.opacity_effect)
+        self.animacion_opacidad = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.animacion_opacidad.setDuration(1500)
+        self.animacion_opacidad.setStartValue(0.2)
+        self.animacion_opacidad.setEndValue(1.0)
+        self.animacion_opacidad.setEasingCurve(QEasingCurve.InOutQuad)
+        self.animacion_opacidad.setLoopCount(-1)  # Infinite loop
+        self.animacion_opacidad.start()
+
+        # Loro animado (GIF)
+        self.labelLoro = QLabel()
+        self.labelLoro.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.labelLoro)
+        self.movie = QMovie(r"Img\loroRojo.gif")
+        self.labelLoro.setMovie(self.movie)
+        self.movie.start()
+
+        # Botón Skip
+        self.btnSkip = QPushButton("Skip")
+        self.btnSkip.setVisible(False)
+        layout.addWidget(self.btnSkip)
+        self.btnSkip.clicked.connect(self.skipIntroduccion)
+        QTimer.singleShot(5000, self.mostrarBoton)
+
+        # Música de fondo
+        self.player = QMediaPlayer()
+        music_path = os.path.abspath(r"Img\Lava_Chicken.wav")
+        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(music_path)))
+        self.player.setVolume(200)
+
+        self.player.play()
+        self.player.mediaStatusChanged.connect(self.verificarFinMusica)
+
+    def mostrarBoton(self):
+        self.btnSkip.setVisible(True)
+
+    def verificarFinMusica(self, status):
+        if status == QMediaPlayer.EndOfMedia:
+            self.irLogin()
+
+    def skipIntroduccion(self):
+        self.player.stop()
+        self.irLogin()
+
+    def irLogin(self):
+        self.player.stop()
+        self.terminado.emit()
+        self.close()
+
 #########################################LOGIN#############################################
 class LoginVista(QWidget):
     def __init__(self):
