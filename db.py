@@ -79,3 +79,68 @@ class ConexionMongo:
         })
     def guardar_estudio(self, info_dict):
             self.__db["estudios"].insert_one(info_dict)
+
+    ######################################CSV############################################
+    def guardar_csv(self, nombre_archivo, ruta_archivo):
+        # Verificar si ya existe esa ruta
+        existente = self.__db["registro_archivos"].find_one({
+            "tipo_archivo": "csv",
+            "ruta": ruta_archivo
+        })
+
+        if existente:
+            print(f"⚠️ Ya existe en la base de datos con ruta: {ruta_archivo}")
+            return False  # Indicar que NO se insertó porque ya existía
+
+        # Insertar nuevo registro
+        registro = {
+            "id": "ARCH" + str(self.__db["registro_archivos"].count_documents({}) + 1).zfill(3),
+            "tipo_archivo": "csv",
+            "nombre_archivo": nombre_archivo,
+            "fecha": datetime.datetime.now().strftime("%d/%m/%Y"),
+            "ruta": ruta_archivo
+        }
+        self.__db["registro_archivos"].insert_one(registro)
+        print(f"Insertado nuevo CSV en base con ruta: {ruta_archivo}")
+        return True  # Indicar éxito
+
+    def listar_csvs(self):
+        cursor = self.__db["registro_archivos"].find({"tipo_archivo": "csv"})
+        lista = list(cursor)
+        print(f"Listados {len(lista)} CSV en base.")
+        return lista
+
+    def obtener_csv_por_id(self, id_archivo):
+        doc = self.__db["registro_archivos"].find_one({"id": id_archivo})
+        if not doc:
+            return None
+        return doc
+
+    
+#######################################MAT####################################
+    def listar_mats(self):
+        cursor = self.__db["registro_archivos"].find({"tipo_archivo": "mat"})
+        lista = list(cursor)
+        print(f"Listados {len(lista)} MAT en base de datos.")
+        return lista
+    
+    def guardar_mat(self, nombre_archivo, ruta_archivo):
+        existente = self.__db["registro_archivos"].find_one({
+            "tipo_archivo": "mat",
+            "ruta": ruta_archivo
+        })
+
+        if existente:
+            print(f"⚠️ Ya existe en la base de datos con ruta: {ruta_archivo}")
+            return False
+
+        registro = {
+            "id": "ARCH" + str(self.__db["registro_archivos"].count_documents({}) + 1).zfill(3),
+            "tipo_archivo": "mat",
+            "nombre_archivo": nombre_archivo,
+            "fecha": datetime.datetime.now().strftime("%d/%m/%Y"),
+            "ruta": ruta_archivo
+        }
+        self.__db["registro_archivos"].insert_one(registro)
+        print(f"Insertado nuevo MAT en base con ruta: {ruta_archivo}")
+        return True
