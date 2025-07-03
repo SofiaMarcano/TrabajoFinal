@@ -1,9 +1,8 @@
 import numpy as np
 import os
 import cv2
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator
-from PyQt5.QtCore import Qt,QTimer
+from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator, QMovie
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QUrl, QEasingCurve, QPropertyAnimation
 from PyQt5.uic import loadUi
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -11,9 +10,113 @@ import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QLineEdit, QVBoxLayout,
     QHBoxLayout, QWidget, QFileDialog, QMessageBox,QFrame, QCheckBox, QSizePolicy,
-    QTableWidget, QSlider, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout
+    QTableWidget, QSlider, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout,
+    QGraphicsOpacityEffect
 )
 from Img import bgPrueba_rc
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+import os
+from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal, QPropertyAnimation, QEasingCurve
+from PyQt5.QtGui import QFont, QMovie
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QGraphicsOpacityEffect
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
+
+class Loro(QWidget):
+    terminado = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("🦜🐱🦋🦎Introducción - LoroBytes")
+        self.setFixedSize(600, 400)
+
+        # 🌙 Tema oscuro con azul cian
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a1a2e;
+                color: #ffffff;
+            }
+            QPushButton {
+                background-color: #00c6ff;
+                color: #ffffff;
+                border: none;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #33d6ff;
+            }
+            QLabel {
+                color: #ffffff;
+            }
+        """)
+
+        # 📦 Layout vertical
+        layout = QVBoxLayout(self)
+
+        self.labelNombre = QLabel("LoroBytes")
+        self.labelNombre.setAlignment(Qt.AlignCenter)
+        self.labelNombre.setFont(QFont("Arial", 32, QFont.Bold))
+        layout.addWidget(self.labelNombre)
+        self.opacity_effect = QGraphicsOpacityEffect()
+        self.labelNombre.setGraphicsEffect(self.opacity_effect)
+        self.animacion_opacidad = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.animacion_opacidad.setDuration(1500)
+        self.animacion_opacidad.setStartValue(0.2)
+        self.animacion_opacidad.setEndValue(1.0)
+        self.animacion_opacidad.setEasingCurve(QEasingCurve.InOutQuad)
+        self.animacion_opacidad.setLoopCount(-1)
+        self.animacion_opacidad.start()
+        self.labelLoro = QLabel()
+        self.labelLoro.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.labelLoro)
+        self.movie = QMovie(r"Img\loroRojo.gif")
+        self.labelLoro.setMovie(self.movie)
+        self.movie.start()
+        self.btnSkip = QPushButton("Skip")
+        self.btnSkip.setVisible(False)
+        layout.addWidget(self.btnSkip)
+        self.btnSkip.clicked.connect(self.skipIntroduccion)
+
+        self.player = QMediaPlayer()
+        self.playlist = QMediaPlaylist()
+        music_path = os.path.abspath(r"Img\Lava_Chicken.wav")
+        self.playlist.addMedia(QMediaContent(QUrl.fromLocalFile(music_path)))
+        self.playlist.setPlaybackMode(QMediaPlaylist.CurrentItemOnce)
+        self.player.setPlaylist(self.playlist)
+        self.player.setVolume(100)
+        self.player.stateChanged.connect(self._estado_cambiado)
+        self.player.mediaStatusChanged.connect(self.verificarFinMusica)
+        self.player.error.connect(lambda e: print("[ERROR]", self.player.errorString()))
+
+        # 🔊 Empieza a cargar y reproducir
+        self.player.play()
+
+    def _estado_cambiado(self, state):
+
+        if state == QMediaPlayer.PlayingState:
+            self.show()
+            QTimer.singleShot(5000, self.mostrarBoton)
+
+        elif state == QMediaPlayer.StoppedState:
+            self.irLogin()
+
+    def verificarFinMusica(self, status):
+        if status == QMediaPlayer.EndOfMedia:
+            self.irLogin()
+
+    def mostrarBoton(self):
+        self.btnSkip.setVisible(True)
+
+    def skipIntroduccion(self):
+        self.player.stop()
+        self.irLogin()
+
+    def irLogin(self):
+        self.player.stop()
+        self.terminado.emit()
+        self.close()
+
 
 #########################################LOGIN#############################################
 class LoginVista(QWidget):
@@ -666,7 +769,7 @@ class CCSV(QMainWindow):
 
     def setControlador(self, c):
         self.__controlador = c
-        self.__controlador.vista = self
+        # self.__controlador.vista = self
         if self.__controlador:
             # Al asignar el controlador, pedirle los CSV guardados
             lista = self.__controlador.listarCSVs()
@@ -933,11 +1036,9 @@ class TablaCSV(QMainWindow):
             botones = QHBoxLayout()
             btnGuardar = QPushButton("Guardar ")
             btnVolver = QPushButton("Volver")
-            btnCerrar = QPushButton("Cerrar")
 
             botones.addWidget(btnGuardar)
             botones.addWidget(btnVolver)
-            botones.addWidget(btnCerrar)
             layout.addLayout(botones)
 
             dialog.setLayout(layout)
@@ -945,7 +1046,6 @@ class TablaCSV(QMainWindow):
             # Conexiones
             btnGuardar.clicked.connect(lambda: self.__accionGuardarImagen(fig,dialog))
             btnVolver.clicked.connect(dialog.accept)
-            btnCerrar.clicked.connect(self.__accionCerrarTodo)
 
             # Cerrar la ventana de tabla (self) mientras se abre esta
             self.hide()
@@ -1034,8 +1134,9 @@ class TablaCSV(QMainWindow):
 
         # Quitar después de 3 segundos
         QTimer.singleShot(3000, toast.close)
-    def __accionCerrarTodo(self):
-        self.close()
+    def __accionCerrarTodo(self,dialog):
+        dialog.accept()
+        self.hide()
         if self.ventana:
             self.ventana.show()
 

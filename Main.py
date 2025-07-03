@@ -1,9 +1,4 @@
-import sys
-from PyQt5.QtWidgets import QApplication
-from Vista import LoginVista
-from db import ConexionMongo
-from Modelo import ModeloBase
-from Controlador import LoginControlador
+
 def rev_num(msj):
     while True:
         try:
@@ -12,27 +7,67 @@ def rev_num(msj):
         except:
             print("Ingrese un numero entero.")
 
+# class AppBioMedica:
+#     def __init__(self):
+#         self.app = QApplication(sys.argv)
+
+#         # Conexión e inicialización de MongoDB
+#         self.mongo = ConexionMongo()
+#         m = self.mongo.ver_o_create()
+
+#         # MVC
+#         self.vista = LoginVista()
+#         self.modelo = ModeloBase(self.mongo)
+#         self.controlador = LoginControlador(self.vista, self.modelo)
+#         self.vista.set_controlador(self.controlador)
+#         if m:
+#             self.controlador.see_inicio(m)
+
+#     def ejecute(self):
+#         self.vista.show()
+#         sys.exit(self.app.exec_())
+
+# if __name__ == "__main__":
+#     aplicacion = AppBioMedica()
+#     aplicacion.ejecute()
+import sys
+from PyQt5.QtWidgets import QApplication
+from Vista import LoginVista, Loro
+from db import ConexionMongo
+from Modelo import ModeloBase
+from Controlador import LoginControlador
+
 class AppBioMedica:
     def __init__(self):
         self.app = QApplication(sys.argv)
 
-        # Conexión e inicialización de MongoDB
+        # Conexión MongoDB
         self.mongo = ConexionMongo()
-        m = self.mongo.ver_o_create()
 
-        # MVC
+        # Crear una sola vez el MVC para Login
         self.vista = LoginVista()
         self.modelo = ModeloBase(self.mongo)
         self.controlador = LoginControlador(self.vista, self.modelo)
         self.vista.set_controlador(self.controlador)
+
+        # Mostrar INTRO primero
+        self.intro = Loro()
+        self.intro.terminado.connect(self.iniciar_login)
+        self.intro.show()
+
+    def iniciar_login(self):
+        # Verifica en Mongo si hay sesión previa
+        m = self.mongo.ver_o_create()
+
         if m:
             self.controlador.see_inicio(m)
 
-    def ejecute(self):
         self.vista.show()
+
+    def ejecute(self):
         sys.exit(self.app.exec_())
 
 if __name__ == "__main__":
-    aplicacion = AppBioMedica()
-    aplicacion.ejecute()
+    app_biomedica = AppBioMedica()
+    app_biomedica.ejecute()
 

@@ -3,12 +3,12 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
+from Vista import CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
 import numpy as np
 import os
-import datetime
+from datetime import datetime
 
 # from Vista import ImagenVista
-from Vista import senalesMenuVista ,CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
 
 class LoginControlador:
     def __init__(self, vista, modelo):
@@ -57,6 +57,7 @@ class LoginControlador:
 
         finally:
             self.vista.normal()
+            
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
