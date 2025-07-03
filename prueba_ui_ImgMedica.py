@@ -15,7 +15,7 @@ import os
 import pydicom
 import numpy as np
 
-class ModeloImagenes:
+class ModeloImagenesMedicas:
     def cargar_dicom(self, carpeta):
         archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.endswith(".dcm")]
         slices = [pydicom.dcmread(f) for f in archivos]
@@ -23,19 +23,18 @@ class ModeloImagenes:
 
         volumen = np.stack([s.pixel_array for s in slices])
 
-        # Metadatos detallados (usa .get para campos que podrían no existir)
         s0 = slices[0]
         info = {
-            "PatientName": f"{s0.get('PatientName','')} (Nombre)",
-            "PatientID": f"{s0.get('PatientID','')} (ID del Paciente)",
-            "PatientSex": f"{s0.get('PatientSex','')} (Sexo)",
-            "StudyDate": f"{s0.get('StudyDate','')} (Fecha del Estudio)",
-            "Modality": f"{s0.get('Modality','')} (Modalidad)",
-            "StudyDescription": f"{s0.get('StudyDescription','')} (Descripción del Estudio)",
-            "SeriesDescription": f"{s0.get('SeriesDescription','')} (Descripción de la Serie)",
-            "Manufacturer": f"{s0.get('Manufacturer','')} (Fabricante)",
-            "PixelSpacing": f"{s0.get('PixelSpacing','')} (Espaciado de Píxeles)",
-            "SliceThickness": f"{s0.get('SliceThickness','')} (Grosor del Corte)"
+            "PatientName": s0.get('PatientName', ''),
+            "PatientID": s0.get('PatientID', ''),
+            "PatientSex": s0.get('PatientSex', ''),
+            "StudyDate": s0.get('StudyDate', ''),
+            "Modality": s0.get('Modality', ''),
+            "StudyDescription": s0.get('StudyDescription', ''),
+            "SeriesDescription": s0.get('SeriesDescription', ''),
+            "Manufacturer": s0.get('Manufacturer', ''),
+            "PixelSpacing": s0.get('PixelSpacing', ''),
+            "SliceThickness": s0.get('SliceThickness', '')
         }
         return volumen, info
 
@@ -45,13 +44,13 @@ class ModeloImagenes:
         volumen = nifti.get_fdata()
         hdr = nifti.header
         info = {
-            "dim (Dimensiones del Volumen)": str(hdr.get('dim', 'N/A')),
-            "pixdim (Tamaño del Voxel)": str(hdr.get('pixdim', 'N/A')),
-            "sform_code / qform_code (Código de Orientación)": f"{hdr.get('sform_code', 'N/A')} / {hdr.get('qform_code', 'N/A')}",
-            "descrip (Descripción)": str(hdr.get('descrip', 'N/A')),
-            "datatype (Tipo de Dato)": str(hdr.get('datatype', 'N/A')),
-            "bitpix (Bits por Píxel)": str(hdr.get('bitpix', 'N/A')),
-            "slice_code (Código de Adquisición de Corte)": str(hdr.get('slice_code', 'N/A')),
+            "dim": str(hdr.get('dim', 'N/A')),
+            "pixdim": str(hdr.get('pixdim', 'N/A')),
+            "sform_code": f"{hdr.get('sform_code', 'N/A')} / {hdr.get('qform_code', 'N/A')}",
+            "descrip": str(hdr.get('descrip', 'N/A')),
+            "datatype": str(hdr.get('datatype', 'N/A')),
+            "bitpix": str(hdr.get('bitpix', 'N/A')),
+            "slice_code": str(hdr.get('slice_code', 'N/A'))
         }
         return volumen, info
 
@@ -70,17 +69,35 @@ class ModeloImagenes:
 
 # Vista 🦎 *****************************************************************************
 
-class VistaImagenes(QMainWindow):
+class VistaImagenesMedicas(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi("archivosUI/imagenMedicaPanel_ventana.ui", self)
 
     def mostrar_info_estudio(self, info):
+        traducciones = {
+            "PatientName": "Nombre",
+            "PatientID": "ID del Paciente",
+            "PatientSex": "Sexo",
+            "StudyDate": "Fecha del Estudio",
+            "Modality": "Modalidad",
+            "StudyDescription": "Descripción del Estudio",
+            "SeriesDescription": "Descripción de la Serie",
+            "Manufacturer": "Fabricante",
+            "PixelSpacing": "Espaciado de Píxeles",
+            "SliceThickness": "Grosor del Corte",
+            "dim": "Dimensiones del Volumen",
+            "pixdim": "Tamaño del Voxel",
+            "sform_code": "Código de Orientación",
+            "descrip": "Descripción",
+            "datatype": "Tipo de Dato",
+            "bitpix": "Bits por Píxel",
+            "slice_code": "Código de Adquisición de Corte" }
         texto = ""
         for k, v in info.items():
-            texto += f"- <b>{k}:</b> {v}<br>"
+            significado = traducciones.get(k, k)
+            texto += f"- <b>{k} ({significado}):</b> {v}<br>"
         self.Info_Estudio.setText(texto)
-
 
     def mostrar_imagen(self, img, label):
         if img is None or np.max(img) == np.min(img):
@@ -96,7 +113,9 @@ class VistaImagenes(QMainWindow):
 
 
 # Controlador 🦎 *****************************************************************************
-class ControladorImagenes:
+import os
+import cv2
+class ControladorImagenesMedicas:
     def __init__(self, vista, modelo):
         self.vista = vista
         self.modelo = modelo
@@ -125,16 +144,21 @@ class ControladorImagenes:
 
         if any(f.endswith(".dcm") for f in os.listdir(carpeta)):
             self.volumen, info = self.modelo.cargar_dicom(carpeta)
+            self.ruta_dicom = os.path.abspath(carpeta)  # Guarda la ruta absoluta de la carpeta DICOM
+            self.ruta_nifti = None                     # No hay NIfTI en este caso
         else:
             ruta, _ = QFileDialog.getOpenFileName(self.vista, "Seleccionar NIfTI", "", "NIfTI (*.nii *.nii.gz)")
             if not ruta:
                 return
             self.volumen, info = self.modelo.cargar_nifti(ruta)
+            self.ruta_nifti = os.path.abspath(ruta)     # Guarda la ruta absoluta del archivo NIfTI
+            self.ruta_dicom = None                      # No hay DICOM en este caso
 
         self.info_metadatos = info
         self.vista.mostrar_info_estudio(info)
         self.inicializar_sliders()
         self.actualizar_todos_planos()
+
 
 
     def inicializar_sliders(self):
@@ -228,16 +252,60 @@ class ControladorImagenes:
         mbox.exec_()
         
     def guardar_estudio(self):
-        # Verificar existencia de PatientName en metadatos
         if "PatientName" not in self.info_metadatos or not self.info_metadatos["PatientName"]:
             QMessageBox.warning(None, "Guardar estudio", 
                 "No se puede guardar el estudio porque no contiene los metadatos necesarios.\n"
-                "Es posible que cargaste un archivo NIfTI que no tiene PatientName.\n"
+                "Posiblemente cargaste un archivo NIfTI que no tiene PatientName.\n"
                 "Presiona Limpiar y selecciona un archivo DICOM para continuar😊.")
             return
-        # Si pasa la validación, guarda en MongoDB
-        self.modelo.guardar_estudio(self.info_metadatos)
-        QMessageBox.information(None, "Guardar estudio", "Estudio guardado exitosamente en la base de datos.")
+        self.info_metadatos["ruta_dicom"] = self.ruta_dicom if hasattr(self, "ruta_dicom") else None
+        self.info_metadatos["ruta_nifti"] = self.ruta_nifti if hasattr(self, "ruta_nifti") else None
+        nombre_estudio = str(self.info_metadatos["PatientName"])
+        carpeta_guardado = os.path.join("Img", nombre_estudio)
+        os.makedirs(carpeta_guardado, exist_ok=True)
+        spacing_x = spacing_y = thickness = 1.0  
+        if "PixelSpacing" in self.info_metadatos:
+            sp = self.info_metadatos["PixelSpacing"]
+            if isinstance(sp, str):
+                sp = sp.split("\\")
+            spacing_y, spacing_x = map(float, sp)
+        if "SliceThickness" in self.info_metadatos:
+            try:
+                thickness = float(self.info_metadatos["SliceThickness"])
+            except:
+                pass
+        cortes = {
+            "Axial": self.volumen[self.vista.Slider_Axial.value(), :, :],
+            "Sagital": self.volumen[:, :, self.vista.Slider_Sagital.value()],
+            "Coronal": self.volumen[:, self.vista.Slider_Coronal.value(), :]
+        }
+        for key, value in self.info_metadatos.items():
+            if not isinstance(value, (str, int, float, list, dict, bool)):
+                self.info_metadatos[key] = str(value)
+        import matplotlib.pyplot as plt
+        for plano, img in cortes.items():
+            img_norm = ((img - img.min()) / (img.max() - img.min()) * 255).astype('uint8')
+            if plano == "Axial":
+                extent = [0, img.shape[1]*spacing_x, 0, img.shape[0]*spacing_y]
+            elif plano == "Sagital":
+                extent = [0, img.shape[1]*spacing_y, 0, img.shape[0]*thickness]
+            elif plano == "Coronal":
+                extent = [0, img.shape[1]*spacing_x, 0, img.shape[0]*thickness]
+            plt.imshow(img_norm, cmap='gray', extent=extent)
+            plt.axis('off')
+            plt.gca().set_aspect('equal')
+            ruta = os.path.join(carpeta_guardado, f"{plano}.png")
+            plt.savefig(ruta, bbox_inches='tight', pad_inches=0)
+            plt.close()
+        try:
+            self.modelo.guardar_estudio(self.info_metadatos)
+            QMessageBox.information(None, "Guardar estudio", 
+                f"Estudio guardado exitosamente en la base de datos y cortes guardados en:\n{carpeta_guardado}")
+        except Exception as e:
+            QMessageBox.warning(None, "Guardar estudio", 
+                f"✅ Las imágenes se guardaron en:\n{carpeta_guardado}\n\n"
+                "❌ No se pudieron subir los metadatos a MongoDB o ocurrió otro error.\n"
+                f"\nDetalles:\n{str(e)}")
 # ----------------------------------------------------------------------------------------
     
 
@@ -246,9 +314,9 @@ class ControladorImagenes:
 # ================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    vista = VistaImagenes()
-    modelo = ModeloImagenes()
-    controlador = ControladorImagenes(vista, modelo)
+    vista = VistaImagenesMedicas()
+    modelo = ModeloImagenesMedicas()
+    controlador = ControladorImagenesMedicas(vista, modelo)
     vista.show()
     sys.exit(app.exec_())
 
