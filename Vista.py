@@ -1171,9 +1171,10 @@ class EstadisticaDialog(QDialog):
  
 ###################PROCESAMIENTO DE IMAGENES##########################
 class ImagenMenuVista(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, usuario=None):
         super().__init__(parent)
-        self.parent = parent  
+        self.parent = parent
+        self.usuario= usuario
         self.setWindowTitle("Cargar Imágenes")
         self.setGeometry(500, 150, 600, 480)
         self.setFixedSize(509, 415)
@@ -1188,7 +1189,7 @@ class ImagenMenuVista(QMainWindow):
     def setupUI(self):
         self.botonVolver= QPushButton("Volver al Menú Principal")
         self.botonVolver.setFixedWidth(200)
-        self.botonVolver.clicked.connet(self.volver)
+        self.botonVolver.clicked.connect(self.volver)
         
         layout_top = QHBoxLayout()
         layout_top.addWidget(self.botonVolver)
@@ -1242,7 +1243,7 @@ class ImagenMenuVista(QMainWindow):
         ventana.setControlador(self.controlador)
         ventana.show()
 class ProcesamientoImagenVista(QMainWindow):
-    def __init__(self, parent=None, usuario="Desconocido", ruta_inicial=None):
+    def __init__(self, parent=None, usuario=None, ruta_inicial=None):
         super().__init__(parent)
         self.parent = parent
         self.usuario = usuario  
@@ -1250,11 +1251,21 @@ class ProcesamientoImagenVista(QMainWindow):
         self.setGeometry(500, 200, 800, 600)
         self.setFixedSize(800, 600)
         self.controlador = None
-        self.ruta_imagen = None
+        self.ruta_imagen = ruta_inicial
         self.imagen_original = None
         self.imagen_procesada = None
         self.ruta_imagen = ruta_inicial
         self.setupUI()
+        if self.ruta_imagen:
+            self.mostrarImagenInicial()
+            
+    def mostrarImagenInicial(self):
+    
+        img = cv2.imread(self.ruta_imagen)
+        if img is not None:
+            self.imagen_original = img
+            self.mostrarImagen(img, titulo="Imagen Original")
+
 
     def setControlador(self, c):
         self.controlador = c
