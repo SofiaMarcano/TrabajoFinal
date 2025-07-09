@@ -144,3 +144,25 @@ class ConexionMongo:
         self.__db["registro_archivos"].insert_one(registro)
         print(f"Insertado nuevo MAT en base con ruta: {ruta_archivo}")
         return True
+    
+    def guardar_imagen(self, nombre_archivo, ruta_archivo, proceso, parametros):
+        existente = self.__db["registro_archivos_imagenes"].find_one({
+            "ruta": ruta_archivo,
+            "proceso": proceso
+        })
+
+        if existente:
+            print("Imagen ya registrada con ese proceso.")
+            return False
+
+        registro = {
+            "tipo_archivo": "imagen",
+            "nombre_archivo": nombre_archivo,
+            "ruta": ruta_archivo,
+            "proceso": proceso,
+            "parametros": parametros
+        }
+
+        self.__db["registro_archivos_imagenes"].insert_one(registro)
+        print(f"Imagen registrada correctamente en base con ruta: {ruta_archivo}")
+        return True

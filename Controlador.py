@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
-from Vista import CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista
+from Vista import CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista, ImagenMenuVista
 import numpy as np
 import os
 from datetime import datetime
@@ -61,9 +61,7 @@ class LoginControlador:
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
-            self.panel = ProcesamientoImagenVista(
-                parent=self.vista, 
-                usuario= self.vista.input_usuario.text())
+            self.panel = ImagenMenuVista(self.vista, self.vista.input_usuario.text())
             self.panel.setControlador(self)
             self.panel.show()
         elif tipo == "senal":
