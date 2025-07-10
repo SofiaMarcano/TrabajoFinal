@@ -5,6 +5,10 @@ from scipy.signal import butter, filtfilt
 from scipy import signal
 from scipy.signal import find_peaks
 import pandas as pd
+import pydicom
+import nibabel as nib
+from nibabel.orientations import aff2axcodes, io_orientation, axcodes2ornt, ornt_transform, apply_orientation, inv_ornt_aff
+
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
@@ -111,6 +115,127 @@ class ModeloBase:
     
     def guardarImagen(self, nombre, ruta, proceso, parametros):
         return self.__conexion.guardar_imagen(nombre, ruta, proceso, parametros)
+    
+    
+    ####################################### IMAGEN MÉDICAS ##############################################
+    def cargar_dicom(self, carpeta):
+        archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.endswith(".dcm")]
+        slices = [pydicom.dcmread(f) for f in archivos]
+        slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
+        volumen = np.stack([s.pixel_array for s in slices])
+        s0 = slices[0]
+        info = {
+            "PatientName": s0.get('PatientName', ''),
+            "PatientID": s0.get('PatientID', ''),
+            "PatientSex": s0.get('PatientSex', ''),
+            "StudyDate": s0.get('StudyDate', ''),
+            "Modality": s0.get('Modality', ''),
+            "StudyDescription": s0.get('StudyDescription', ''),
+            "SeriesDescription": s0.get('SeriesDescription', ''),
+            "Manufacturer": s0.get('Manufacturer', ''),
+            "PixelSpacing": s0.get('PixelSpacing', ''),
+            "SliceThickness": s0.get('SliceThickness', '')
+        }
+        return volumen, info
+
+    def cargar_nifti(self, ruta):
+        nifti = nib.load(ruta)
+        volumen = nifti.get_fdata()
+        hdr = nifti.header
+        affine = nifti.affine
+        from nibabel.orientations import aff2axcodes
+        actual_ornt = aff2axcodes(affine)
+        info = {
+            "dim": str(hdr.get('dim', 'N/A')),
+            "pixdim": str(hdr.get('pixdim', 'N/A')),
+            "orientacion": str(actual_ornt),
+            "sform_code": f"{hdr.get('sform_code', 'N/A')} / {hdr.get('qform_code', 'N/A')}",
+            "descrip": str(hdr.get('descrip', 'N/A')),
+            "datatype": str(hdr.get('datatype', 'N/A')),
+            "bitpix": str(hdr.get('bitpix', 'N/A')),
+            "slice_code": str(hdr.get('slice_code', 'N/A'))
+        }
+        return volumen, info
+
+    def dicom_a_nifti(self, carpeta, salida, metadatos_actualizados=None):
+        volumen, info = self.cargar_dicom(carpeta)
+        img_nifti = nib.Nifti1Image(volumen, affine=np.eye(4))
+        nib.save(img_nifti, salida)
+        info["ruta_dicom"] = os.path.abspath(carpeta)
+        info["ruta_nifti"] = os.path.abspath(salida)
+        if metadatos_actualizados:
+            info.update(metadatos_actualizados)
+        return info, True, ""
+        
+    def guardar_estudio(self, metadatos):
+        for key, value in metadatos.items():
+            if not isinstance(value, (str, int, float, bool, type(None))):
+                metadatos[key] = str(value)
+        mongo = self.__conexion
+        mongo.guardar_estudio(metadatos)
+        
+    def guardar_estudio_completo(self, volumen, info_metadatos, sliders, carpeta_base="Img"):
+        import os
+        import matplotlib.pyplot as plt
+        # Validación de metadatos clave
+        if "PatientName" not in info_metadatos or not info_metadatos["PatientName"]:
+            return False, 
+        """No se puede guardar el estudio porque no contiene los metadatos necesarios.
+        Posiblemente cargaste un archivo NIfTI que no tiene por ejemplo PatientName,
+        Presiona Limpiar y selecciona un archivo DICOM para continuar😊."""
+
+        nombre_estudio = str(info_metadatos["PatientName"])
+        carpeta_guardado = os.path.join(carpeta_base, nombre_estudio)
+        os.makedirs(carpeta_guardado, exist_ok=True)
+
+        spacing_x = spacing_y = thickness = 1.0
+        if "PixelSpacing" in info_metadatos:
+            sp = info_metadatos["PixelSpacing"]
+            if isinstance(sp, str):
+                
+                if "[" in sp and "]" in sp:
+                    import ast
+                    sp = ast.literal_eval(sp) #Verifica si es un string de lista python y evalúalo con ast.literal_eval
+                else:
+                    sp = sp.split("\\")
+            spacing_y, spacing_x = map(float, sp)
+        if "SliceThickness" in info_metadatos:
+            try:
+                thickness = float(info_metadatos["SliceThickness"])
+            except:
+                pass
+        cortes = {
+            "Axial": volumen[sliders["axial"], :, :],
+            "Sagital": volumen[:, :, sliders["sagital"]],
+            "Coronal": volumen[:, sliders["coronal"], :]
+        }
+
+        # Normalizar y guardar imágenes
+        for plano, img in cortes.items():
+            img_norm = ((img - img.min()) / (img.max() - img.min()) * 255).astype('uint8')
+            if plano == "Axial":
+                extent = [0, img.shape[1]*spacing_x, 0, img.shape[0]*spacing_y]
+            elif plano == "Sagital":
+                extent = [0, img.shape[1]*spacing_y, 0, img.shape[0]*thickness]
+            elif plano == "Coronal":
+                extent = [0, img.shape[1]*spacing_x, 0, img.shape[0]*thickness]
+            plt.imshow(img_norm, cmap='gray', extent=extent)
+            plt.axis('off')
+            plt.gca().set_aspect('equal')
+            ruta = os.path.join(carpeta_guardado, f"{plano}.png")
+            plt.savefig(ruta, bbox_inches='tight', pad_inches=0)
+            plt.close()
+
+        # Guardar en base de datos
+        for key, value in info_metadatos.items():
+            if not isinstance(value, (str, int, float, list, dict, bool)):
+                info_metadatos[key] = str(value)
+
+        try:
+            self.guardar_estudio(info_metadatos)
+            return True, carpeta_guardado
+        except Exception as e:
+            return False, f"Error al guardar en DB: {str(e)}"
 
 
 

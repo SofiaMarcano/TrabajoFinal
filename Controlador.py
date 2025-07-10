@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect, QFileDialog
 from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
-from Vista import CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista, ImagenMenuVista
+from Vista import CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
 import numpy as np
 import os
 from datetime import datetime
@@ -18,6 +18,10 @@ class LoginControlador:
         self._columnasCSV = []
         self._rutaCSV = None 
         self._cargadoDesdeBase = False
+        self.volumen = None
+        self.info_metadatos = {}
+        self.ruta_dicom = None
+        self.ruta_nifti = None
 
         self.vista.boton_login.clicked.connect(self.ver_login) ## Conectar el botón de login con el método que valida el acceso
 
@@ -66,6 +70,10 @@ class LoginControlador:
             self.panel.show()
         elif tipo == "senal":
             self.panel = senalesMenuVista(self.vista)
+            self.panel.setControlador(self)
+            self.panel.show()
+        elif tipo == "imagenMed":
+            self.panel = VistaImagenesMedicas(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
 
@@ -305,7 +313,113 @@ class LoginControlador:
     def guardarImagen(self, nombre, ruta, proceso, parametros):
         resultado = self.modelo.guardarImagen(nombre, ruta, proceso, parametros)
         return resultado
+########################################IMÁGENES MÉDICAS###########################################
+    def cargar_archivo(self):
+            carpeta = QFileDialog.getExistingDirectory(self.panel, "Seleccionar carpeta DICOM")
+            if carpeta and any(f.endswith(".dcm") for f in os.listdir(carpeta)):
+                self.panel.boton_ModificarMetadatos.setEnabled(True)
+                self.panel.boton_transf_dcm_nii.setEnabled(True) 
+                self.volumen, info = self.modelo.cargar_dicom(carpeta)
+                self.ruta_dicom = carpeta
+                self.ruta_nifti = None
+                
+            else:
+                ruta, _ = QFileDialog.getOpenFileName(self.panel, "Seleccionar NIfTI", "", "NIfTI (*.nii *.nii.gz)")
+                if not ruta: return
+                self.volumen, info = self.modelo.cargar_nifti(ruta)
+                self.ruta_nifti = ruta
+                self.ruta_dicom = None
 
+            self.info_metadatos = info
+            self.panel.mostrar_info_estudio(info)
+            z, y, x = self.volumen.shape
+            self.panel.inicializar_sliders(z, y, x)
+            self.actualizar_todos_planos()
+
+    def actualizar_todos_planos(self):
+        self.actualizar_axial()
+        self.actualizar_sagital()
+        self.actualizar_coronal()
+
+    def actualizar_axial(self):
+        if self.volumen is None:
+            return
+        idx = self.panel.Slider_Axial.value()
+        corte = self.volumen[idx, :, :]
+        self.panel.mostrar_imagen(corte, self.panel.plano_Axial)
+
+    def actualizar_sagital(self):
+        if self.volumen is None:
+            return        
+        idx = self.panel.Slider_Sagital.value()
+        corte = self.volumen[:, :, idx]
+        self.panel.mostrar_imagen(corte, self.panel.plano_Sagital)
+
+    def actualizar_coronal(self):
+        if self.volumen is None:
+            return        
+        idx = self.panel.Slider_Coronal.value()
+        corte = self.volumen[:, idx, :]
+        self.panel.mostrar_imagen(corte, self.panel.plano_Coronal)
+
+    def limpiar_pantalla(self):
+        self.volumen = None
+        self.ruta_dicom = None
+        self.ruta_nifti = None
+        self.panel.limpiar()
+
+    def transformar_dicom_a_nifti(self):
+        if not self.ruta_dicom:
+            self.panel.mostrar_advertencia("Error", "Debes cargar un archivo DICOM primero.")
+            return
+        salida, _ = QFileDialog.getSaveFileName(self.panel, "¿Donde vas a guardar el NIfTI resultante?", "salida.nii", "NIfTI (*.nii *.nii.gz)")
+        if not salida: return
+        info, ok, msg = self.modelo.dicom_a_nifti(self.ruta_dicom, salida, self.info_metadatos)
+        if ok:
+            self.ruta_nifti = info.get("ruta_nifti")
+            self.info_metadatos = info
+            self.panel.mostrar_mensaje("Let's Go🔥", "Conversión y guardado exitosos✅.")
+        else:
+            self.panel.mostrar_advertencia("Error", f"Error: {msg}")
+
+    def modificar_metadatos(self):
+        if not self.ruta_dicom:
+            QMessageBox.warning(None, "Modificar metadatos", 
+                "Solo puedes modificar metadatos si cargaste un archivo DICOM.")
+            return
+
+        dialogo = ModificarMetadatos(self.info_metadatos, self.panel)
+        if dialogo.exec_():  # Si presionó Guardar
+            nuevos_datos = dialogo.obtener_datos()
+            self.info_metadatos.update(nuevos_datos)  # Actualiza en memoria
+            self.panel.mostrar_info_estudio(self.info_metadatos)  # Actualiza en pantalla
+
+    def guardar_estudio(self):
+        if self.ruta_nifti and not self.ruta_dicom:
+            # Escenario 1: solo nii cargado
+            self.panel.mostrar_mensaje("Guardar estudio", 
+                "Se cargó un archivo NIfTI para visualización y análisis.\nNo se requiere guardado en base de datos ☝.")
+            return
+
+        elif self.ruta_dicom:
+            # Escenario 2 o 3
+            sliders = {
+                "axial": self.panel.Slider_Axial.value(),
+                "sagital": self.panel.Slider_Sagital.value(),
+                "coronal": self.panel.Slider_Coronal.value()
+            }
+
+            # Actualiza info_metadatos con rutas
+            self.info_metadatos["ruta_dicom"] = os.path.abspath(self.ruta_dicom) if self.ruta_dicom else None
+            self.info_metadatos["ruta_nifti"] = os.path.abspath(self.ruta_nifti) if self.ruta_nifti else None
+
+            exito, resultado = self.modelo.guardar_estudio_completo(self.volumen, self.info_metadatos, sliders)
+            if exito:
+                self.panel.mostrar_mensaje("Guardar estudio", f"✅ Estudio guardado exitosamente.\nImágenes guardadas en: {resultado}")
+            else:
+                self.panel.mostrar_advertencia("Guardar estudio", f"❌ No se pudo guardar el estudio.\nDetalles: {resultado}")
+        else:
+            self.panel.mostrar_advertencia("Guardar estudio", "No has cargado ningún archivo válido para guardar.")
 
 
 

@@ -28,6 +28,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QWidget" name="widget_contenedor" native="true">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);</string>
+           </property>
            <widget class="QFrame" name="frame_planos">
             <property name="geometry">
              <rect>
@@ -38,7 +41,7 @@
              </rect>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(0, 255, 127);</string>
+             <string notr="true">background-color: rgb(74, 111, 165);</string>
             </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
@@ -49,22 +52,55 @@
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
               <widget class="QLabel" name="plano_Axial">
+               <property name="font">
+                <font>
+                 <pointsize>14</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>Plano Axial</string>
+                <string/>
+               </property>
+               <property name="pixmap">
+                <pixmap resource="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc">:/img_dummies_planosAnatomicos/axial.jpg</pixmap>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="plano_Sagital">
+               <property name="font">
+                <font>
+                 <pointsize>14</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>Plano Sagital</string>
+                <string/>
+               </property>
+               <property name="pixmap">
+                <pixmap resource="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc">:/img_dummies_planosAnatomicos/sagital.jpg</pixmap>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="plano_Coronal">
+               <property name="font">
+                <font>
+                 <pointsize>14</pointsize>
+                </font>
+               </property>
                <property name="text">
-                <string>Plano Coronal</string>
+                <string/>
+               </property>
+               <property name="pixmap">
+                <pixmap resource="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc">:/img_dummies_planosAnatomicos/coronal.jpg</pixmap>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -79,9 +115,12 @@
               <height>761</height>
              </rect>
             </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: rgb(225, 225, 225);
-background-color: rgb(255, 255, 127);</string>
+background-color: rgb(232, 240, 254);</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
@@ -173,7 +212,7 @@ background-color: rgb(255, 255, 127);</string>
              </rect>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(170, 255, 127);
+             <string notr="true">background-color: rgb(180, 200, 240);
 </string>
             </property>
             <property name="frameShape">
@@ -200,7 +239,10 @@ background-color: rgb(255, 255, 127);</string>
              <property name="styleSheet">
               <string notr="true">background-color: rgb(17, 170, 255);
 ;
-color: rgb(255, 255, 127);</string>
+color: rgb(255, 255, 255);
+
+ border-radius: 10px; 
+</string>
              </property>
              <property name="text">
               <string>Subir Archivo</string>
@@ -248,18 +290,6 @@ color: rgb(255, 255, 127);</string>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout">
-              <item row="1" column="2">
-               <widget class="QPushButton" name="boton_GuardarEstudio">
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(170, 17, 255);
-;
-color: rgb(255, 255, 127);</string>
-                </property>
-                <property name="text">
-                 <string>Guardar Estudio</string>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="1">
                <widget class="QPushButton" name="boton_Limpiar">
                 <property name="styleSheet">
@@ -276,7 +306,7 @@ color: rgb(85, 170, 255);</string>
                 <property name="styleSheet">
                  <string notr="true">background-color: rgb(17, 170, 255);
 ;
-color: rgb(255, 255, 127);</string>
+color: rgb(255, 255, 255);</string>
                 </property>
                 <property name="text">
                  <string>Modificar Metadatos</string>
@@ -288,15 +318,46 @@ color: rgb(255, 255, 127);</string>
                 <property name="styleSheet">
                  <string notr="true">background-color: rgb(17, 170, 255);
 ;
-color: rgb(255, 255, 127);</string>
+color: rgb(255, 255, 255);</string>
                 </property>
                 <property name="text">
                  <string>Transformar DICOM a NIfTI</string>
                 </property>
                </widget>
               </item>
+              <item row="1" column="2">
+               <widget class="QPushButton" name="boton_GuardarEstudio">
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(170, 17, 255);
+;
+color: rgb(255, 255, 127);</string>
+                </property>
+                <property name="text">
+                 <string>Guardar Estudio</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
+           </widget>
+           <widget class="QPushButton" name="boton_volver">
+            <property name="geometry">
+             <rect>
+              <x>688</x>
+              <y>730</y>
+              <width>121</width>
+              <height>28</height>
+             </rect>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(255, 255, 127);</string>
+            </property>
+            <property name="text">
+             <string>VOLVER</string>
+            </property>
            </widget>
           </widget>
          </item>
@@ -319,6 +380,8 @@ color: rgb(255, 255, 127);</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc"/>
+ </resources>
  <connections/>
 </ui>
