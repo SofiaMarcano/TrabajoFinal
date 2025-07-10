@@ -65,9 +65,7 @@ class LoginControlador:
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
-            self.panel = ProcesamientoImagenVista(
-                parent=self.vista, 
-                usuario= self.vista.input_usuario.text())
+            self.panel = ImagenMenuVista(self.vista, self.vista.input_usuario.text())
             self.panel.setControlador(self)
             self.panel.show()
         elif tipo == "senal":
