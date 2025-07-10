@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import cv2
-from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator, QMovie
+from PyQt5.QtGui import QFont, QPalette, QColor, QCursor, QIntValidator, QMovie, QPixmap, QImage
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QUrl, QEasingCurve, QPropertyAnimation
 from PyQt5.uic import loadUi
 from matplotlib.figure import Figure
@@ -1354,3 +1354,175 @@ class ProcesamientoImagenVista(QMainWindow):
             self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
         else:
             self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")
+            
+            
+##################################### EXPERTO EN IMG-MÉDICAS #########################################
+
+class VistaImagenesMedicas(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.parent = parent
+        loadUi("archivosUI/imagenMedicaPanel_ventana.ui", self)
+        self.__controlador = None
+        self.mostrar_imagenes_por_defecto()
+
+    def setControlador(self, c):
+        self.__controlador = c
+        self.setup_connections()
+
+    def setup_connections(self):
+        self.boton_SubirArchivo.clicked.connect(self.__controlador.cargar_archivo)
+        self.Slider_Axial.valueChanged.connect(self.__controlador.actualizar_axial)
+        self.Slider_Sagital.valueChanged.connect(self.__controlador.actualizar_sagital)
+        self.Slider_Coronal.valueChanged.connect(self.__controlador.actualizar_coronal)
+        self.spinBox_Axial.valueChanged.connect(lambda v: self.Slider_Axial.setValue(v))
+        self.spinBox_Sagital.valueChanged.connect(lambda v: self.Slider_Sagital.setValue(v))
+        self.spinBox_Coronal.valueChanged.connect(lambda v: self.Slider_Coronal.setValue(v))
+        self.boton_volver.clicked.connect(self.volver)
+        self.boton_Limpiar.clicked.connect(self.__controlador.limpiar_pantalla)
+        self.boton_transf_dcm_nii.clicked.connect(self.__controlador.transformar_dicom_a_nifti)
+        self.boton_GuardarEstudio.clicked.connect(self.__controlador.guardar_estudio)
+        self.boton_ModificarMetadatos.clicked.connect(self.__controlador.modificar_metadatos)
+        
+        self.boton_ModificarMetadatos.setEnabled(False)
+        self.boton_transf_dcm_nii.setEnabled(False) 
+
+    def mostrar_info_estudio(self, info):
+        traducciones = {
+            "PatientName": "Nombre", "PatientID": "ID del Paciente",
+            "PatientSex": "Sexo", "StudyDate": "Fecha del Estudio",
+            "Modality": "Modalidad", "StudyDescription": "Descripción del Estudio",
+            "SeriesDescription": "Descripción de la Serie", "Manufacturer": "Fabricante",
+            "PixelSpacing": "Espaciado de Píxeles", "SliceThickness": "Grosor del Corte",
+            "dim": "Dimensiones del Volumen", "pixdim": "Tamaño del Voxel",
+            "sform_code": "Código de Orientación", "descrip": "Descripción",
+            "datatype": "Tipo de Dato", "bitpix": "Bits por Píxel", "slice_code": "Código de Adquisición"
+        }
+        texto = ""
+        for k, v in info.items():
+            significado = traducciones.get(k, k)
+            texto += f"- <b>{k} ({significado}):</b> {v}<br>"
+        self.Info_Estudio.setText(texto)
+
+    def mostrar_imagen(self, img, label):
+        if img is None or np.max(img) == np.min(img):
+            label.clear()
+            return
+        img = ((img - np.min(img)) / (np.max(img) - np.min(img)) * 255).astype(np.uint8)
+        h, w = img.shape
+        qimg = QImage(img.tobytes(), w, h, w, QImage.Format_Grayscale8)
+        pixmap = QPixmap.fromImage(qimg).scaled(label.width(), label.height())
+        label.setPixmap(pixmap)
+
+    def inicializar_sliders(self, z, y, x):
+        self.Slider_Axial.setMaximum(z - 1)
+        self.spinBox_Axial.setMaximum(z - 1)
+        self.Slider_Axial.setValue(z // 2)
+        self.spinBox_Axial.setValue(z // 2)
+
+        self.Slider_Sagital.setMaximum(x - 1)
+        self.spinBox_Sagital.setMaximum(x - 1)
+        self.Slider_Sagital.setValue(x // 2)
+        self.spinBox_Sagital.setValue(x // 2)
+
+        self.Slider_Coronal.setMaximum(y - 1)
+        self.spinBox_Coronal.setMaximum(y - 1)
+        self.Slider_Coronal.setValue(y // 2)
+        self.spinBox_Coronal.setValue(y // 2)
+
+    def mostrar_imagenes_por_defecto(self):
+        ruta_base = os.path.dirname(__file__)
+        self.mostrar_imagen_archivo(os.path.join(ruta_base, "img", "img_dummies_planosAnatomicos", "axial.jpg"), self.plano_Axial)
+        self.mostrar_imagen_archivo(os.path.join(ruta_base, "img", "img_dummies_planosAnatomicos", "sagital.jpg"), self.plano_Sagital)
+        self.mostrar_imagen_archivo(os.path.join(ruta_base, "img", "img_dummies_planosAnatomicos", "coronal.jpg"), self.plano_Coronal)
+
+    def mostrar_imagen_archivo(self, ruta, label):
+        pixmap = QPixmap(ruta)
+        label.setPixmap(pixmap)
+
+    def volver(self):
+        self.close()
+        if self.parent is not None:
+            self.parent.show()
+
+    def limpiar(self):
+        self.mostrar_imagenes_por_defecto()
+        self.boton_ModificarMetadatos.setEnabled(False)
+        self.boton_transf_dcm_nii.setEnabled(False)
+        self.Info_Estudio.setText("Información del Estudio (metadatos ordenados)\n")
+        for s, sp in [(self.Slider_Axial, self.spinBox_Axial),
+                      (self.Slider_Sagital, self.spinBox_Sagital),
+                      (self.Slider_Coronal, self.spinBox_Coronal)]:
+            s.setMaximum(0)
+            s.setValue(0)
+            sp.setMaximum(0)
+            sp.setValue(0)
+
+    def mostrar_mensaje(self, titulo, mensaje):
+        QMessageBox.information(self, titulo, mensaje)
+
+    def mostrar_advertencia(self, titulo, mensaje):
+        QMessageBox.warning(self, titulo, mensaje)
+        
+class ModificarMetadatos(QDialog):
+    def __init__(self, info_actual, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Modificar Metadatos")
+        self.resize(300, 200)
+
+        # Crear widgets manualmente sin .ui
+        from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox
+
+        layout = QVBoxLayout()
+
+        # Nombre
+        layout_nombre = QHBoxLayout()
+        layout_nombre.addWidget(QLabel("Nombre:"))
+        self.lineEdit_Nombre = QLineEdit(str(info_actual.get("PatientName", "")))
+        layout_nombre.addWidget(self.lineEdit_Nombre)
+        layout.addLayout(layout_nombre)
+
+        # ID
+        layout_id = QHBoxLayout()
+        layout_id.addWidget(QLabel("ID:"))
+        self.lineEdit_ID = QLineEdit(str(info_actual.get("PatientID", "")))
+        layout_id.addWidget(self.lineEdit_ID)
+        layout.addLayout(layout_id)
+
+        # Sexo
+        layout_sexo = QHBoxLayout()
+        layout_sexo.addWidget(QLabel("Sexo:"))
+        self.comboBox_Sexo = QComboBox()
+        self.comboBox_Sexo.addItems(["M", "F", "O"])
+        self.comboBox_Sexo.setCurrentText(str(info_actual.get("PatientSex", "")))
+        layout_sexo.addWidget(self.comboBox_Sexo)
+        layout.addLayout(layout_sexo)
+
+        # Descripción
+        layout_descrip = QHBoxLayout()
+        layout_descrip.addWidget(QLabel("Descripción:"))
+        self.lineEdit_descrip = QLineEdit(str(info_actual.get("StudyDescription", "")))
+        layout_descrip.addWidget(self.lineEdit_descrip)
+        layout.addLayout(layout_descrip)
+
+        # Botones
+        layout_botones = QHBoxLayout()
+        self.boton_Guardar = QPushButton("Guardar")
+        self.boton_Cancelar = QPushButton("Cancelar")
+        layout_botones.addWidget(self.boton_Guardar)
+        layout_botones.addWidget(self.boton_Cancelar)
+        layout.addLayout(layout_botones)
+
+        self.setLayout(layout)
+
+        # Conexiones
+        self.boton_Guardar.clicked.connect(self.accept)
+        self.boton_Cancelar.clicked.connect(self.reject)
+
+    def obtener_datos(self):
+        return {
+            "PatientName": self.lineEdit_Nombre.text(),
+            "PatientID": self.lineEdit_ID.text(),
+            "PatientSex": self.comboBox_Sexo.currentText(),
+            "StudyDescription": self.lineEdit_descrip.text()
+        }

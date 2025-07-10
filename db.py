@@ -22,8 +22,9 @@ class ConexionMongo:
         if self.__db["usuarios"].count_documents({}) == 0:
             print("La base de datos no encontrada. Creando datos de ejemplo...")
             self.__db["usuarios"].insert_many([
-                {"usuario": "WilliamMora", "password": "12345", "tipo_usuario": "imagen"},
-                {"usuario": "CarmenLucia", "password": "Plumas1", "tipo_usuario": "senal"}
+                {"usuario": "DanielaLucia", "password": "12345", "tipo_usuario": "imagen"},
+                {"usuario": "CarmenLucia", "password": "Plumas1", "tipo_usuario": "senal"},
+                {"usuario": "WilliamMora", "password": "Gecko3", "tipo_usuario": "imagenMed"}
             ])
             m.append("Base de datos inicializada con usuarios.")
 
