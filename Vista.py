@@ -1170,8 +1170,80 @@ class EstadisticaDialog(QDialog):
         return self.comboColumna.currentText(), self.comboOperacion.currentText()
  
 ###################PROCESAMIENTO DE IMAGENES##########################
+class ImagenMenuVista(QMainWindow):
+    def __init__(self, parent=None, usuario=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.usuario= usuario
+        self.setWindowTitle("Cargar Imágenes")
+        self.setGeometry(500, 150, 600, 480)
+        self.setFixedSize(509, 415)
+
+        self.ruta_imagen = None
+        self.controlador = None
+        self.setupUI()
+        
+    def setControlador(self, c):
+        self.controlador = c
+
+    def setupUI(self):
+        self.botonVolver= QPushButton("Volver al Menú Principal")
+        self.botonVolver.setFixedWidth(200)
+        self.botonVolver.clicked.connect(self.volver)
+        
+        layout_top = QHBoxLayout()
+        layout_top.addWidget(self.botonVolver)
+        layout_top.addStretch()
+
+        # Etiqueta centrada
+        self.labelTitulo = QLabel("Cargar imagen jpg o png")
+        self.labelTitulo.setAlignment(Qt.AlignCenter)
+        self.labelTitulo.setStyleSheet("font-size: 16px;")
+
+        # Botón grande cargar
+        self.botonCargar = QPushButton("Cargar imagen")
+        self.botonCargar.setFixedHeight(40)
+        self.botonCargar.clicked.connect(self.cargarImagen)
+
+        # Layout principal
+        layout_main = QVBoxLayout()
+        layout_main.addLayout(layout_top)
+        layout_main.addStretch()
+        layout_main.addWidget(self.labelTitulo)
+        layout_main.addWidget(self.botonCargar, alignment=Qt.AlignCenter)
+        layout_main.addStretch()
+
+        central = QWidget()
+        central.setLayout(layout_main)
+        self.setCentralWidget(central)
+        
+    def volver(self):
+            self.close()
+            if self.parent:
+                self.parent.show()
+                
+    def cargarImagen(self):
+            ruta, _ = QFileDialog.getOpenFileName(
+                self,
+                "Seleccionar imagen",
+                "",
+                "Imágenes (*.png *.jpg *.jpeg)"
+            )
+            if ruta:
+            
+                self.close()
+            # abrir la ventana de procesamiento
+                self.abrirProcesamiento(ruta)
+
+    def abrirProcesamiento(self,ruta):
+        ventana = ProcesamientoImagenVista(
+                parent= self.parent,
+                ruta_inicial= ruta
+            )
+        ventana.setControlador(self.controlador)
+        ventana.show()
 class ProcesamientoImagenVista(QMainWindow):
-    def __init__(self, parent=None, usuario="Desconocido"):
+    def __init__(self, parent=None, usuario=None, ruta_inicial=None):
         super().__init__(parent)
         self.parent = parent
         self.usuario = usuario  
@@ -1179,11 +1251,21 @@ class ProcesamientoImagenVista(QMainWindow):
         self.setGeometry(500, 200, 800, 600)
         self.setFixedSize(800, 600)
         self.controlador = None
-        self.ruta_imagen = None
+        self.ruta_imagen = ruta_inicial
         self.imagen_original = None
         self.imagen_procesada = None
-
+        self.ruta_imagen = ruta_inicial
         self.setupUI()
+        if self.ruta_imagen:
+            self.mostrarImagenInicial()
+            
+    def mostrarImagenInicial(self):
+    
+        img = cv2.imread(self.ruta_imagen)
+        if img is not None:
+            self.imagen_original = img
+            self.mostrarImagen(img, titulo="Imagen Original")
+
 
     def setControlador(self, c):
         self.controlador = c
@@ -1353,8 +1435,7 @@ class ProcesamientoImagenVista(QMainWindow):
         if self.checkboxMostrar.isChecked():
             self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
         else:
-            self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")
-            
+            self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")            
             
 ##################################### EXPERTO EN IMG-MÉDICAS #########################################
 
@@ -1469,8 +1550,6 @@ class ModificarMetadatos(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Modificar Metadatos")
         self.resize(300, 200)
-
-        # Crear widgets manualmente sin .ui
         from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox
 
         layout = QVBoxLayout()
@@ -1526,3 +1605,9 @@ class ModificarMetadatos(QDialog):
             "PatientSex": self.comboBox_Sexo.currentText(),
             "StudyDescription": self.lineEdit_descrip.text()
         }
+    def mostrarImagenInicial(self):
+        img = cv2.imread(self.ruta_imagen)
+        if img is not None:
+            self.imagen_original = img
+            self.mostrarImagen(img, titulo="Imagen Original")
+
