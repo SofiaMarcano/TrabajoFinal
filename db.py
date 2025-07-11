@@ -22,8 +22,9 @@ class ConexionMongo:
         if self.__db["usuarios"].count_documents({}) == 0:
             print("La base de datos no encontrada. Creando datos de ejemplo...")
             self.__db["usuarios"].insert_many([
-                {"usuario": "WilliamMora", "password": "12345", "tipo_usuario": "imagen"},
-                {"usuario": "CarmenLucia", "password": "Plumas1", "tipo_usuario": "senal"}
+                {"usuario": "DanielaLucia", "password": "12345", "tipo_usuario": "imagen"},
+                {"usuario": "CarmenLucia", "password": "Plumas1", "tipo_usuario": "senal"},
+                {"usuario": "WilliamMora", "password": "Gecko3", "tipo_usuario": "imagenMed"}
             ])
             m.append("Base de datos inicializada con usuarios.")
 
@@ -143,4 +144,26 @@ class ConexionMongo:
         }
         self.__db["registro_archivos"].insert_one(registro)
         print(f"Insertado nuevo MAT en base con ruta: {ruta_archivo}")
+        return True
+    
+    def guardar_imagen(self, nombre_archivo, ruta_archivo, proceso, parametros):
+        existente = self.__db["registro_archivos_imagenes"].find_one({
+            "ruta": ruta_archivo,
+            "proceso": proceso
+        })
+
+        if existente:
+            print("Imagen ya registrada con ese proceso.")
+            return False
+
+        registro = {
+            "tipo_archivo": "imagen",
+            "nombre_archivo": nombre_archivo,
+            "ruta": ruta_archivo,
+            "proceso": proceso,
+            "parametros": parametros
+        }
+
+        self.__db["registro_archivos_imagenes"].insert_one(registro)
+        print(f"Imagen registrada correctamente en base con ruta: {ruta_archivo}")
         return True
