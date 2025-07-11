@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
-from Vista import CCSV,TablaCSV, ProcesamientoImagenVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
+from Vista import CCSV,TablaCSV, ImagenMenuVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
 import numpy as np
 import os
 from datetime import datetime
