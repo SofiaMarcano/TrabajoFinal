@@ -1175,7 +1175,6 @@ class ImagenMenuVista(QMainWindow):
         super().__init__(parent=None)
         self.parent = parent
         loadUi("archivosUI/ImagenMenuVista.ui", self)
-        #self.controlador = None
         
         self.setGeometry(500, 200, 600, 500)
         self.setFixedSize(626, 507)
@@ -1197,7 +1196,7 @@ class ImagenMenuVista(QMainWindow):
         
         if ruta:  # Si el usuario selecciona una imagen
             # Crear una instancia de la ventana de procesamiento
-            ventana = ProcesamientoImagenVista(self.parent.parent(), ruta_inicial= ruta)  # Pasar la ruta de la imagen
+            ventana = ProcesamientoImagenVista(self.parent, ruta_inicial= ruta)  # Pasar la ruta de la imagen
             ventana.setControlador(self.controlador)  # Establecer el controlador
             self.close()  # Cerrar la ventana actual
             ventana.show()
@@ -1205,8 +1204,9 @@ class ImagenMenuVista(QMainWindow):
 class ProcesamientoImagenVista(QMainWindow):
     def __init__(self, parent=None, usuario=None, ruta_inicial=None):
         super().__init__(parent)
-        self.parent = parent
-        self.usuario = usuario  
+        
+        self.usuario = usuario 
+        self.parent= parent 
         self.setWindowTitle("Procesamiento de Imágenes")
         self.setGeometry(500, 200, 800, 600)
         self.setFixedSize(800, 600)
@@ -1374,13 +1374,15 @@ class ProcesamientoImagenVista(QMainWindow):
         self.figure.tight_layout()
         self.canvas.draw()
 
+    #def volver(self):
+    #   self.close()
+    #   if self.parent:
+    #       self.parent.show()
+    #   else:
+    #       QMessageBox.warning(self, "Error", "No se pudo volver al menú principal.")
     def volver(self):
         self.close()
-        if self.parent:
-            self.parent.show()
-        else:
-            QMessageBox.warning(self, "Error", "No se pudo volver al menú principal.")
-
+        self.parent.show()  # Volver a la ventana padre (ImagenMenuVista)
             
     def verificarVisibilidadKernel(self):
         proceso = self.comboProceso.currentText()
