@@ -1495,7 +1495,7 @@ class VistaImagenesMedicas(QMainWindow):
         self.mostrar_imagenes_por_defecto()
         self.boton_ModificarMetadatos.setEnabled(False)
         self.boton_transf_dcm_nii.setEnabled(False)
-        self.Info_Estudio.setText("Información del Estudio (metadatos ordenados)\n")
+        self.Info_Estudio.setText("Información del Estudio (metadatos ordenados)🦎\n")
         for s, sp in [(self.Slider_Axial, self.spinBox_Axial),
                       (self.Slider_Sagital, self.spinBox_Sagital),
                       (self.Slider_Coronal, self.spinBox_Coronal)]:

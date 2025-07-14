@@ -121,7 +121,11 @@ class ModeloBase:
     def cargar_dicom(self, carpeta):
         archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if f.endswith(".dcm")]
         slices = [pydicom.dcmread(f) for f in archivos]
-        slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
+        slices = [s for s in slices if 'PixelData' in s]
+        if all(hasattr(s, 'ImagePositionPatient') for s in slices):
+            slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
+        elif all(hasattr(s, 'InstanceNumber') for s in slices):
+            slices.sort(key=lambda x: int(x.InstanceNumber))
         volumen = np.stack([s.pixel_array for s in slices])
         s0 = slices[0]
         info = {
@@ -136,13 +140,26 @@ class ModeloBase:
             "PixelSpacing": s0.get('PixelSpacing', ''),
             "SliceThickness": s0.get('SliceThickness', '')
         }
+        iop = s0.get('ImageOrientationPatient', None)
+        if iop:
+            row_cosines = np.array(iop[:3])
+            col_cosines = np.array(iop[3:])
+            if col_cosines[1] < 0:
+                volumen = volumen[:, ::-1, :]
+            if row_cosines[0] < 0:
+                volumen = volumen[:, :, ::-1]
+
         return volumen, info
 
     def cargar_nifti(self, ruta):
         nifti = nib.load(ruta)
-        volumen = nifti.get_fdata()
-        hdr = nifti.header
-        affine = nifti.affine
+        nifti_canon = nib.as_closest_canonical(nifti)
+        volumen = nifti_canon.get_fdata()
+        if volumen.shape[0] == volumen.shape[1]: # Validar forma y reorganizar si es (x,y,z) en lugar de (z,y,x)
+            volumen = np.transpose(volumen, (2,1,0))
+            volumen = volumen[::-1, ::-1, :]        
+        hdr = nifti_canon.header
+        affine = nifti_canon.affine
         from nibabel.orientations import aff2axcodes
         actual_ornt = aff2axcodes(affine)
         info = {
@@ -174,16 +191,13 @@ class ModeloBase:
         mongo = self.__conexion
         mongo.guardar_estudio(metadatos)
         
-    def guardar_estudio_completo(self, volumen, info_metadatos, sliders, carpeta_base="Img"):
+    def guardar_estudio_dicom_completo(self, volumen, info_metadatos, sliders, carpeta_base="Img"):
         import os
         import matplotlib.pyplot as plt
         # Validación de metadatos clave
         if "PatientName" not in info_metadatos or not info_metadatos["PatientName"]:
-            return False, 
-        """No se puede guardar el estudio porque no contiene los metadatos necesarios.
-        Posiblemente cargaste un archivo NIfTI que no tiene por ejemplo PatientName,
-        Presiona Limpiar y selecciona un archivo DICOM para continuar😊."""
-
+            return False
+        
         nombre_estudio = str(info_metadatos["PatientName"])
         carpeta_guardado = os.path.join(carpeta_base, nombre_estudio)
         os.makedirs(carpeta_guardado, exist_ok=True)
@@ -195,7 +209,7 @@ class ModeloBase:
                 
                 if "[" in sp and "]" in sp:
                     import ast
-                    sp = ast.literal_eval(sp) #Verifica si es un string de lista python y evalúalo con ast.literal_eval
+                    sp = ast.literal_eval(sp)
                 else:
                     sp = sp.split("\\")
             spacing_y, spacing_x = map(float, sp)
@@ -226,7 +240,6 @@ class ModeloBase:
             plt.savefig(ruta, bbox_inches='tight', pad_inches=0)
             plt.close()
 
-        # Guardar en base de datos
         for key, value in info_metadatos.items():
             if not isinstance(value, (str, int, float, list, dict, bool)):
                 info_metadatos[key] = str(value)
@@ -237,6 +250,43 @@ class ModeloBase:
         except Exception as e:
             return False, f"Error al guardar en DB: {str(e)}"
 
+    def guardar_estudio_nifti_completo(self, volumen, info_metadatos, sliders, carpeta_base="Img"):
+        import matplotlib.pyplot as plt
+        if "descrip" not in info_metadatos or not info_metadatos["descrip"]:
+            return False
+        from datetime import datetime
+        base_name = os.path.splitext(os.path.basename(info_metadatos.get("ruta_nifti", "NIfTI.nii")))[0]
+        nombre_estudio = f"{base_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+        carpeta_guardado = os.path.join(carpeta_base, nombre_estudio)
+        os.makedirs(carpeta_guardado, exist_ok=True)
+
+        spacing_x = spacing_y = spacing_z = 1.0
+        cortes = {
+            "Axial": volumen[sliders["axial"], :, :],
+            "Sagital": volumen[:, :, sliders["sagital"]],
+            "Coronal": volumen[:, sliders["coronal"], :]
+        }
+
+        for plano, img in cortes.items():
+            img_norm = ((img - img.min()) / (img.max() - img.min()) * 255).astype('uint8')
+            plt.imshow(img_norm, cmap='gray')
+            plt.axis('off')
+            plt.gca().set_aspect('equal')
+            ruta = os.path.join(carpeta_guardado, f"{plano}.png")
+            plt.savefig(ruta, bbox_inches='tight', pad_inches=0)
+            plt.close()
+
+        info_metadatos["ruta_cortes"] = carpeta_guardado
+        for key, value in info_metadatos.items():
+            if not isinstance(value, (str, int, float, list, dict, bool)):
+                info_metadatos[key] = str(value)
+
+        try:
+            self.guardar_estudio(info_metadatos)
+            return True, carpeta_guardado
+        except Exception as e:
+            return False, f"Error al guardar NIfTI en DB: {str(e)}"
 
 
 

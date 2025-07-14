@@ -35,7 +35,7 @@ from PyQt5.QtWidgets import QApplication
 from Vista import LoginVista, Loro
 from db import ConexionMongo
 from Modelo import ModeloBase
-from Controlador import LoginControlador
+from Controlador import Controlador
 
 class AppBioMedica:
     def __init__(self):
@@ -47,7 +47,7 @@ class AppBioMedica:
         # Crear una sola vez el MVC para Login
         self.vista = LoginVista()
         self.modelo = ModeloBase(self.mongo)
-        self.controlador = LoginControlador(self.vista, self.modelo)
+        self.controlador = Controlador(self.vista, self.modelo)
         self.vista.set_controlador(self.controlador)
 
         # Mostrar INTRO primero
