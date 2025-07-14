@@ -1177,15 +1177,15 @@ class ImagenMenuVista(QMainWindow):
         loadUi("archivosUI/ImagenMenuVista.ui", self)
         
         self.setGeometry(500, 200, 600, 500)
-        self.setFixedSize(626, 507)
+        self.setFixedSize(594, 420)
         self.setup()
         
     def setControlador(self, c):
         self.controlador = c
 
     def setup(self):
-        self.cargarBoton.clicked.connect(self.VentanacargarImagen)
         self.Volver.clicked.connect(self.volver)
+        self.cargarBoton.clicked.connect(self.VentanacargarImagen)
         
     def volver(self):
         self.close()     
@@ -1194,11 +1194,10 @@ class ImagenMenuVista(QMainWindow):
     def VentanacargarImagen(self):   
         ruta, _ = QFileDialog.getOpenFileName(self, "Cargar Imagen", "", "Imágenes (*.jpg *.png)")
         
-        if ruta:  # Si el usuario selecciona una imagen
-            # Crear una instancia de la ventana de procesamiento
-            ventana = ProcesamientoImagenVista(self.parent, ruta_inicial= ruta)  # Pasar la ruta de la imagen
-            ventana.setControlador(self.controlador)  # Establecer el controlador
-            self.close()  # Cerrar la ventana actual
+        if ruta: 
+            ventana = ProcesamientoImagenVista(self.parent, ruta_inicial= ruta) 
+            ventana.setControlador(self.controlador)  
+            self.close()
             ventana.show()
             
 class ProcesamientoImagenVista(QMainWindow):
@@ -1208,8 +1207,8 @@ class ProcesamientoImagenVista(QMainWindow):
         self.usuario = usuario 
         self.parent= parent 
         self.setWindowTitle("Procesamiento de Imágenes")
-        self.setGeometry(500, 200, 800, 600)
-        self.setFixedSize(800, 600)
+        self.setGeometry(500, 200, 800, 700)
+        self.setFixedSize(800, 700)
         self.controlador = None
         self.ruta_imagen = ruta_inicial
         self.imagen_original = None
@@ -1226,16 +1225,13 @@ class ProcesamientoImagenVista(QMainWindow):
             self.imagen_original = img
             self.mostrarImagen(img, titulo="Imagen Original")
 
-
     def setControlador(self, c):
         self.controlador = c
-
+    
     def setupUI(self):
-        # Canvas de Matplotlib
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
 
-        # ComboBox de procesos
         self.comboProceso = QComboBox()
         self.comboProceso.addItems([
             "Conversión a grises",
@@ -1243,39 +1239,67 @@ class ProcesamientoImagenVista(QMainWindow):
             "Binarización",
             "Apertura",
             "Cierre",
-            "Canny",
+            "Contornos de imagen",
             "Conteo de células"
         ])
+        self.comboProceso.setCurrentText("Apertura")  
+        self.comboProceso.currentTextChanged.connect(self.verificarVisibilidadKernel)
 
         self.sliderKernel = QSlider(Qt.Horizontal)
         self.sliderKernel.setRange(1, 20)
         self.sliderKernel.setValue(3)
-        self.labelKernel = QLabel("Kernel: 3")
 
-        # Checkbox mostrar/ocultar original
+        self.labelKernel = QLabel("Kernel: 3")
+        self.labelKernel.setAlignment(Qt.AlignCenter)
+        self.labelKernel.setStyleSheet("""
+            color: black;
+            font-size: 14px;
+            font-family: "Times New Roman";
+        """)
+
+        self.sliderKernel.valueChanged.connect(
+            lambda: self.labelKernel.setText(f"Kernel: {self.sliderKernel.value()}")
+        )
+
         self.checkboxMostrar = QCheckBox("Mostrar imagen original")
+        self.checkboxMostrar.setStyleSheet("""
+            color: black;
+            font-size: 14px;
+            font-family: "Times New Roman";
+        """)
+
         self.botonCargar = QPushButton("Cargar Imagen")
         self.botonAplicar = QPushButton("Aplicar Proceso")
         self.botonVolver = QPushButton("Volver")
 
-        # Conexiones
         self.botonCargar.clicked.connect(self.cargarImagen)
         self.botonAplicar.clicked.connect(self.aplicarProceso)
         self.botonVolver.clicked.connect(self.volver)
-        self.sliderKernel.valueChanged.connect(lambda: self.labelKernel.setText(f"Kernel: {self.sliderKernel.value()}"))
-        self.comboProceso.currentTextChanged.connect(self.verificarVisibilidadKernel)
         self.checkboxMostrar.stateChanged.connect(self.actualizarImagenMostrada)
+
+        self.labelResultado = QLabel()
+        self.labelResultado.setAlignment(Qt.AlignCenter)
+        self.labelResultado.setStyleSheet("""
+            color: black;
+            font-size: 16px;
+            font-family: "Times New Roman";
+            font-weight: bold;
+        """)
+        self.labelResultado.hide()
 
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
 
         controles = QHBoxLayout()
-        controles.addWidget(QLabel("Proceso:"))
+        labelProceso= QLabel("Procesos:")
+        labelProceso.setMinimumWidth(60) 
+        controles.addWidget(labelProceso)
+        controles.addWidget(self.labelResultado)
         controles.addWidget(self.comboProceso)
         controles.addWidget(self.sliderKernel)
         controles.addWidget(self.labelKernel)
         controles.addWidget(self.checkboxMostrar)
-
+        
         botones = QHBoxLayout()
         botones.addWidget(self.botonCargar)
         botones.addWidget(self.botonAplicar)
@@ -1287,7 +1311,7 @@ class ProcesamientoImagenVista(QMainWindow):
         central = QWidget()
         central.setLayout(layout)
         self.setCentralWidget(central)
-        
+        self.verificarVisibilidadKernel()
 
     def cargarImagen(self):
         ruta, _ = QFileDialog.getOpenFileName(
@@ -1299,13 +1323,10 @@ class ProcesamientoImagenVista(QMainWindow):
             self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
 
     def aplicarProceso(self):
-        if self.imagen_original is None:
-            QMessageBox.warning(self, "Error", "Primero cargue una imagen.")
-            return
-
         proceso = self.comboProceso.currentText()
         kernel_size = self.sliderKernel.value()
         img = self.imagen_original.copy()
+        self.labelResultado.hide()
 
         if proceso == "Conversión a grises":
             img_proc = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -1334,15 +1355,19 @@ class ProcesamientoImagenVista(QMainWindow):
 
         elif proceso == "Conteo de células":
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-            contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            img_proc = cv2.drawContours(gray.copy(), contours, -1, (255, 0, 0), 2)
-            QMessageBox.information(self, "Conteo", f"Células detectadas: {len(contours)}")
+            binary = cv2.threshold(gray, gray.mean(), 255, cv2.THRESH_BINARY)[1]
 
-        else:
-            QMessageBox.warning(self, "Error", "Proceso no reconocido.")
-            return
+            kernel = np.ones((3, 3), np.uint8)
+            binary = cv2.erode(binary, kernel, iterations=11)
+            binary = cv2.dilate(binary, kernel, iterations=8)
 
+            contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            celulas_contadas = len(contours)
+            img_proc = img.copy()
+            cv2.drawContours(img_proc, contours, -1, (255, 255, 255), 2)
+            self.labelResultado.setText(f"Número de células detectadas: {celulas_contadas}")
+            self.labelResultado.show()
+        
         self.imagen_procesada = img_proc
         if self.checkboxMostrar.isChecked():
             self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
@@ -1350,7 +1375,6 @@ class ProcesamientoImagenVista(QMainWindow):
             self.mostrarImagen(img_proc, titulo=proceso)
         self.mostrarImagen(img_proc, titulo=proceso)
 
-        # Registro 
         nombre = os.path.basename(self.ruta_imagen) 
         ruta = self.ruta_imagen
         parametros = {"kernel": kernel_size}
@@ -1359,8 +1383,7 @@ class ProcesamientoImagenVista(QMainWindow):
             nombre, ruta, proceso, parametros
         )
 
-        QMessageBox.information(self, "Registro", "Procesamiento guardado correctamente.")
-        
+
     def mostrarImagen(self, img, titulo="Imagen"):
         self.figure.clear()
         ax = self.figure.add_subplot(111)
@@ -1369,20 +1392,20 @@ class ProcesamientoImagenVista(QMainWindow):
         else:
             img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             ax.imshow(img_rgb)
-        ax.set_title(titulo)
+        ax.set_title(
+            titulo,
+            fontsize=23,
+            fontname="Times New Roman",
+            color="black",
+            fontweight="bold",
+            loc="center"
+        )
         ax.axis("off")
         self.figure.tight_layout()
         self.canvas.draw()
-
-    #def volver(self):
-    #   self.close()
-    #   if self.parent:
-    #       self.parent.show()
-    #   else:
-    #       QMessageBox.warning(self, "Error", "No se pudo volver al menú principal.")
     def volver(self):
         self.close()
-        self.parent.show()  # Volver a la ventana padre (ImagenMenuVista)
+        self.parent.show() 
             
     def verificarVisibilidadKernel(self):
         proceso = self.comboProceso.currentText()
@@ -1394,11 +1417,10 @@ class ProcesamientoImagenVista(QMainWindow):
             self.labelKernel.hide()
 
     def actualizarImagenMostrada(self):
-    
-        if self.imagen_procesada is None:
-            return 
+        
         if self.checkboxMostrar.isChecked():
-            self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
+           self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
+            
         else:
             self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")            
             
