@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QTableWidget, QSlider, QTableWidgetItem,QComboBox,QInputDialog,QDialog, QDialogButtonBox, QFormLayout,
     QGraphicsOpacityEffect
 )
-from Img import bgPrueba_rc
+from Img import bgPrueba_rc, recursos
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaPlaylist, QMediaContent
 import os
 from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal, QPropertyAnimation, QEasingCurve
@@ -1172,13 +1172,12 @@ class EstadisticaDialog(QDialog):
 ###################PROCESAMIENTO DE IMAGENES##########################
 class ImagenMenuVista(QMainWindow):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(parent=None)
         self.parent = parent
         loadUi("archivosUI/ImagenMenuVista.ui", self)
-        #self.controlador = None
         
         self.setGeometry(500, 200, 600, 500)
-        self.setFixedSize(530, 400)
+        self.setFixedSize(626, 507)
         self.setup()
         
     def setControlador(self, c):
@@ -1189,20 +1188,25 @@ class ImagenMenuVista(QMainWindow):
         self.Volver.clicked.connect(self.volver)
         
     def volver(self):
-            self.close()     
-            self.parent.show()
+        self.close()     
+        self.parent.show()
                 
     def VentanacargarImagen(self):   
-        ventana= ProcesamientoImagenVista(self)
-        ventana.setControlador(self.controlador)
-        self.close()
-        ventana.show()
+        ruta, _ = QFileDialog.getOpenFileName(self, "Cargar Imagen", "", "Imágenes (*.jpg *.png)")
         
+        if ruta:  # Si el usuario selecciona una imagen
+            # Crear una instancia de la ventana de procesamiento
+            ventana = ProcesamientoImagenVista(self.parent, ruta_inicial= ruta)  # Pasar la ruta de la imagen
+            ventana.setControlador(self.controlador)  # Establecer el controlador
+            self.close()  # Cerrar la ventana actual
+            ventana.show()
+            
 class ProcesamientoImagenVista(QMainWindow):
     def __init__(self, parent=None, usuario=None, ruta_inicial=None):
         super().__init__(parent)
-        self.parent = parent
-        self.usuario = usuario  
+        
+        self.usuario = usuario 
+        self.parent= parent 
         self.setWindowTitle("Procesamiento de Imágenes")
         self.setGeometry(500, 200, 800, 600)
         self.setFixedSize(800, 600)
@@ -1370,10 +1374,15 @@ class ProcesamientoImagenVista(QMainWindow):
         self.figure.tight_layout()
         self.canvas.draw()
 
+    #def volver(self):
+    #   self.close()
+    #   if self.parent:
+    #       self.parent.show()
+    #   else:
+    #       QMessageBox.warning(self, "Error", "No se pudo volver al menú principal.")
     def volver(self):
         self.close()
-        if self.parent:
-            self.parent.show()
+        self.parent.show()  # Volver a la ventana padre (ImagenMenuVista)
             
     def verificarVisibilidadKernel(self):
         proceso = self.comboProceso.currentText()
@@ -1486,7 +1495,7 @@ class VistaImagenesMedicas(QMainWindow):
         self.mostrar_imagenes_por_defecto()
         self.boton_ModificarMetadatos.setEnabled(False)
         self.boton_transf_dcm_nii.setEnabled(False)
-        self.Info_Estudio.setText("Información del Estudio (metadatos ordenados)\n")
+        self.Info_Estudio.setText("Información del Estudio (metadatos ordenados)🦎\n")
         for s, sp in [(self.Slider_Axial, self.spinBox_Axial),
                       (self.Slider_Sagital, self.spinBox_Sagital),
                       (self.Slider_Coronal, self.spinBox_Coronal)]:
