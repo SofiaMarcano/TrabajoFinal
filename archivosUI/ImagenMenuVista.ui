@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
+    <width>615</width>
     <height>507</height>
    </rect>
   </property>
@@ -32,19 +32,15 @@
    <enum>Qt::LeftToRight</enum>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#centralwidget {
-    background-image: url(:/Img/ventana.png);
-    border-image: url(:/Img/ventana.png) 0 0 0 0 stretch stretch;
-    background-color: transparent;
-}
+   <string notr="true">background-color: rgb(194, 192, 118);
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>40</y>
+      <x>10</x>
+      <y>50</y>
       <width>562</width>
       <height>401</height>
      </rect>
@@ -63,22 +59,23 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>106</width>
+         <width>98</width>
          <height>33</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>150</width>
-         <height>16777215</height>
+         <width>70</width>
+         <height>33</height>
         </size>
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
+         <family>Cambria</family>
+         <pointsize>16</pointsize>
+         <weight>50</weight>
          <italic>false</italic>
-         <bold>true</bold>
+         <bold>false</bold>
          <underline>false</underline>
          <kerning>true</kerning>
         </font>
@@ -89,8 +86,11 @@
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(170, 170, 127);</string>
+       </property>
        <property name="text">
-        <string>Volver al Menú </string>
+        <string>Volver</string>
        </property>
        <property name="iconSize">
         <size>
@@ -127,23 +127,43 @@
       </spacer>
      </item>
      <item>
+      <widget class="Line" name="line">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(85, 85, 0);</string>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="label">
        <property name="font">
         <font>
-         <family>Cambria</family>
-         <pointsize>15</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
+         <family>Times New Roman</family>
+         <pointsize>30</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
        <property name="text">
-        <string>Selecciona la imagen para procesarla:</string>
+        <string>Selección de Imagen</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(85, 85, 0);</string>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -160,36 +180,42 @@
        </property>
       </spacer>
      </item>
-     <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-      <widget class="QPushButton" name="cargarBoton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>4</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>300</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>400</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Cambria</family>
-         <pointsize>14</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Cargar Imagen (.jpg o .png)</string>
-       </property>
-      </widget>
+     <item>
+      <layout class="QFormLayout" name="formLayout"/>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Archivo jpg. o .png</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="cargarBoton">
+         <property name="font">
+          <font>
+           <family>Times New Roman</family>
+           <pointsize>18</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(195, 126, 6);
+border-color: rgb(26, 26, 26);</string>
+         </property>
+         <property name="text">
+          <string>Cargar</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <spacer name="verticalSpacer_2">
@@ -238,7 +264,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>626</width>
+     <width>615</width>
      <height>26</height>
     </rect>
    </property>
