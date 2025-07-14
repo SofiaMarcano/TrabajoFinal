@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect, QFileDialog
 from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
+from Vista import CCSV,TablaCSV, ImagenMenuVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
 from Vista import CCSV,TablaCSV, ImagenMenuVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
 import numpy as np
 import os
@@ -10,7 +12,7 @@ from datetime import datetime
 
 # from Vista import ImagenVista
 
-class LoginControlador:
+class Controlador:
     def __init__(self, vista, modelo):
         self.vista = vista
         self.modelo = modelo
@@ -18,6 +20,10 @@ class LoginControlador:
         self._columnasCSV = []
         self._rutaCSV = None 
         self._cargadoDesdeBase = False
+        self.volumen = None
+        self.info_metadatos = {}
+        self.ruta_dicom = None
+        self.ruta_nifti = None
         self.volumen = None
         self.info_metadatos = {}
         self.ruta_dicom = None
@@ -62,14 +68,20 @@ class LoginControlador:
         finally:
             self.vista.normal()
             
+            
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
+            self.panel = ImagenMenuVista(self.vista)
             self.panel = ImagenMenuVista(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
         elif tipo == "senal":
             self.panel = senalesMenuVista(self.vista)
+            self.panel.setControlador(self)
+            self.panel.show()
+        elif tipo == "imagenMed":
+            self.panel = VistaImagenesMedicas(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
         elif tipo == "imagenMed":
@@ -313,6 +325,7 @@ class LoginControlador:
     def guardarImagen(self, nombre, ruta, proceso, parametros):
         resultado = self.modelo.guardarImagen(nombre, ruta, proceso, parametros)
         return resultado
+    
 ########################################IMÁGENES MÉDICAS###########################################
     def cargar_archivo(self):
             carpeta = QFileDialog.getExistingDirectory(self.panel, "Seleccionar carpeta DICOM")
@@ -395,29 +408,34 @@ class LoginControlador:
             self.panel.mostrar_info_estudio(self.info_metadatos)  # Actualiza en pantalla
 
     def guardar_estudio(self):
+        sliders = {
+            "axial": self.panel.Slider_Axial.value(),
+            "sagital": self.panel.Slider_Sagital.value(),
+            "coronal": self.panel.Slider_Coronal.value()
+        }
+
         if self.ruta_nifti and not self.ruta_dicom:
-            # Escenario 1: solo nii cargado
-            self.panel.mostrar_mensaje("Guardar estudio", 
-                "Se cargó un archivo NIfTI para visualización y análisis.\nNo se requiere guardado en base de datos ☝.")
+            # Guardar estudio NIfTI
+            self.info_metadatos["ruta_nifti"] = os.path.abspath(self.ruta_nifti)
+            exito, resultado = self.modelo.guardar_estudio_nifti_completo(self.volumen, self.info_metadatos, sliders)
+            if exito:
+                self.panel.mostrar_mensaje("Guardar estudio", f"✅ Estudio NIfTI guardado exitosamente.\nImágenes guardadas en: {resultado}")
+            else:
+                self.panel.mostrar_advertencia("Guardar estudio", f"❌ No se pudo guardar el estudio NIfTI.\nDetalles: {resultado}")
             return
 
         elif self.ruta_dicom:
-            # Escenario 2 o 3
-            sliders = {
-                "axial": self.panel.Slider_Axial.value(),
-                "sagital": self.panel.Slider_Sagital.value(),
-                "coronal": self.panel.Slider_Coronal.value()
-            }
-
-            # Actualiza info_metadatos con rutas
-            self.info_metadatos["ruta_dicom"] = os.path.abspath(self.ruta_dicom) if self.ruta_dicom else None
+            # Guardar estudio DICOM (como ya estaba)
+            self.info_metadatos["ruta_dicom"] = os.path.abspath(self.ruta_dicom)
             self.info_metadatos["ruta_nifti"] = os.path.abspath(self.ruta_nifti) if self.ruta_nifti else None
 
-            exito, resultado = self.modelo.guardar_estudio_completo(self.volumen, self.info_metadatos, sliders)
+            exito, resultado = self.modelo.guardar_estudio_dicom_completo(self.volumen, self.info_metadatos, sliders)
             if exito:
-                self.panel.mostrar_mensaje("Guardar estudio", f"✅ Estudio guardado exitosamente.\nImágenes guardadas en: {resultado}")
+                self.panel.mostrar_mensaje("Guardar estudio", f"✅ Estudio DICOM guardado exitosamente.\nImágenes guardadas en: {resultado}")
             else:
-                self.panel.mostrar_advertencia("Guardar estudio", f"❌ No se pudo guardar el estudio.\nDetalles: {resultado}")
+                self.panel.mostrar_advertencia("Guardar estudio", f"❌ No se pudo guardar el estudio DICOM.\nDetalles: {resultado}")
+            return
+
         else:
             self.panel.mostrar_advertencia("Guardar estudio", "No has cargado ningún archivo válido para guardar.")
 
