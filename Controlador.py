@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QInputDialog, QWidget, QLabel, QVBoxLayout, QGraphicsDropShadowEffect, QFileDialog
 from PyQt5.QtCore import Qt, QTimer, QTime
 from PyQt5.QtGui import QPixmap, QFont, QColor
 from PyQt5.QtMultimedia import QSound
 import pandas as pd
+from Vista import CCSV,TablaCSV, ImagenMenuVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
 from Vista import CCSV,TablaCSV, ImagenMenuVista, senalesMenuVista, VistaImagenesMedicas, ModificarMetadatos
 import numpy as np
 import os
@@ -18,6 +20,10 @@ class Controlador:
         self._columnasCSV = []
         self._rutaCSV = None 
         self._cargadoDesdeBase = False
+        self.volumen = None
+        self.info_metadatos = {}
+        self.ruta_dicom = None
+        self.ruta_nifti = None
         self.volumen = None
         self.info_metadatos = {}
         self.ruta_dicom = None
@@ -62,14 +68,20 @@ class Controlador:
         finally:
             self.vista.normal()
             
+            
     def abrirVista(self,tipo):
         self.vista.close()
         if tipo == "imagen":
+            self.panel = ImagenMenuVista(self.vista)
             self.panel = ImagenMenuVista(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
         elif tipo == "senal":
             self.panel = senalesMenuVista(self.vista)
+            self.panel.setControlador(self)
+            self.panel.show()
+        elif tipo == "imagenMed":
+            self.panel = VistaImagenesMedicas(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
         elif tipo == "imagenMed":

@@ -9,6 +9,10 @@ import pydicom
 import nibabel as nib
 from nibabel.orientations import aff2axcodes, io_orientation, axcodes2ornt, ornt_transform, apply_orientation, inv_ornt_aff
 
+import pydicom
+import nibabel as nib
+from nibabel.orientations import aff2axcodes, io_orientation, axcodes2ornt, ornt_transform, apply_orientation, inv_ornt_aff
+
 class ModeloBase:
     def __init__(self, conexion_mongo):
         self.__conexion = conexion_mongo
