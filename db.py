@@ -155,14 +155,17 @@ class ConexionMongo:
         if existente:
             print("Imagen ya registrada con ese proceso.")
             return False
+        
+        fecha_registro = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
         registro = {
             "tipo_archivo": "imagen",
             "nombre_archivo": nombre_archivo,
             "ruta": ruta_archivo,
             "proceso": proceso,
-            "parametros": parametros
-        }
+            "parametros": parametros,
+            "fecha_registro": fecha_registro
+    }
 
         self.__db["registro_archivos_imagenes"].insert_one(registro)
         print(f"Imagen registrada correctamente en base con ruta: {ruta_archivo}")

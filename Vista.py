@@ -1378,10 +1378,10 @@ class ProcesamientoImagenVista(QMainWindow):
         nombre = os.path.basename(self.ruta_imagen) 
         ruta = self.ruta_imagen
         parametros = {"kernel": kernel_size}
-
+        
         resultado = self.controlador.guardarImagen(
             nombre, ruta, proceso, parametros
-        )
+            )
 
 
     def mostrarImagen(self, img, titulo="Imagen"):
@@ -1421,8 +1421,14 @@ class ProcesamientoImagenVista(QMainWindow):
         if self.checkboxMostrar.isChecked():
            self.mostrarImagen(self.imagen_original, titulo="Imagen Original")
             
+        elif self.imagen_procesada is not None:
+            self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")    
         else:
-            self.mostrarImagen(self.imagen_procesada, titulo="Último Proceso")            
+            QMessageBox.warning(self, "Error", 
+            "<p style='color: black; font-family: \"Times New Roman\"; font-size: 16px;'>No hay una imagen procesada para mostrar.</p>"
+            )
+
+        
             
 ##################################### EXPERTO EN IMG-MÉDICAS #########################################
 
