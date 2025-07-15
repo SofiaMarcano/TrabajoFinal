@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>877</width>
-    <height>867</height>
+    <width>937</width>
+    <height>910</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,9 +60,6 @@
                <property name="text">
                 <string/>
                </property>
-               <property name="pixmap">
-                <pixmap resource="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc">:/img_dummies_planosAnatomicos/axial.jpg</pixmap>
-               </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
@@ -78,9 +75,6 @@
                <property name="text">
                 <string/>
                </property>
-               <property name="pixmap">
-                <pixmap resource="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc">:/img_dummies_planosAnatomicos/sagital.jpg</pixmap>
-               </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
@@ -95,9 +89,6 @@
                </property>
                <property name="text">
                 <string/>
-               </property>
-               <property name="pixmap">
-                <pixmap resource="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc">:/img_dummies_planosAnatomicos/coronal.jpg</pixmap>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -290,14 +281,15 @@ color: rgb(255, 255, 255);
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout">
-              <item row="1" column="1">
-               <widget class="QPushButton" name="boton_Limpiar">
+              <item row="0" column="1">
+               <widget class="QPushButton" name="boton_transf_dcm_nii">
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(85, 170, 255);</string>
+                 <string notr="true">background-color: rgb(17, 170, 255);
+;
+color: rgb(255, 255, 255);</string>
                 </property>
                 <property name="text">
-                 <string>Limpiar🧹</string>
+                 <string>Transformar DICOM a NIfTI</string>
                 </property>
                </widget>
               </item>
@@ -313,15 +305,14 @@ color: rgb(255, 255, 255);</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="QPushButton" name="boton_transf_dcm_nii">
+              <item row="1" column="1">
+               <widget class="QPushButton" name="boton_Limpiar">
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(17, 170, 255);
-;
-color: rgb(255, 255, 255);</string>
+                 <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(85, 170, 255);</string>
                 </property>
                 <property name="text">
-                 <string>Transformar DICOM a NIfTI</string>
+                 <string>Limpiar🧹</string>
                 </property>
                </widget>
               </item>
@@ -373,7 +364,7 @@ color: rgb(255, 255, 127);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>877</width>
+     <width>937</width>
      <height>26</height>
     </rect>
    </property>
