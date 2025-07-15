@@ -275,24 +275,12 @@ color: rgb(255, 255, 255);
              <property name="geometry">
               <rect>
                <x>20</x>
-               <y>530</y>
+               <y>550</y>
                <width>407</width>
                <height>171</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="1">
-               <widget class="QPushButton" name="boton_transf_dcm_nii">
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(17, 170, 255);
-;
-color: rgb(255, 255, 255);</string>
-                </property>
-                <property name="text">
-                 <string>Transformar DICOM a NIfTI</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="2">
                <widget class="QPushButton" name="boton_ModificarMetadatos">
                 <property name="styleSheet">
@@ -302,17 +290,6 @@ color: rgb(255, 255, 255);</string>
                 </property>
                 <property name="text">
                  <string>Modificar Metadatos</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QPushButton" name="boton_Limpiar">
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(255, 255, 255);
-color: rgb(85, 170, 255);</string>
-                </property>
-                <property name="text">
-                 <string>Limpiar🧹</string>
                 </property>
                </widget>
               </item>
@@ -328,27 +305,44 @@ color: rgb(255, 255, 127);</string>
                 </property>
                </widget>
               </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="boton_transf_dcm_nii">
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(17, 170, 255);
+;
+color: rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>Transformar DICOM a NIfTI</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QPushButton" name="boton_Limpiar">
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(85, 170, 255);</string>
+                </property>
+                <property name="text">
+                 <string>Limpiar🧹</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QPushButton" name="boton_volver">
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(255, 255, 127);</string>
+                </property>
+                <property name="text">
+                 <string>VOLVER</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
-           </widget>
-           <widget class="QPushButton" name="boton_volver">
-            <property name="geometry">
-             <rect>
-              <x>688</x>
-              <y>730</y>
-              <width>121</width>
-              <height>28</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(255, 255, 127);</string>
-            </property>
-            <property name="text">
-             <string>VOLVER</string>
-            </property>
            </widget>
           </widget>
          </item>
@@ -371,8 +365,6 @@ color: rgb(255, 255, 127);</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources>
-  <include location="../../Desktop/UdeA 2025-1/Informatica _2_principal/Unidad4/prueba_img_ui/dummies.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
