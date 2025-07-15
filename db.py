@@ -4,7 +4,7 @@ import pandas as pd
 class ConexionMongo:
 
 ############################################LOGIN#######################################
-    def __init__(self, uri="mongodb://localhost:27017/", db_nombre="bioapp"):
+    def __init__(self, uri="mongodb://localhost:27017/", db_nombre="Lorosbyte"):
         self.__cliente = MongoClient(uri)
         self.__db = self.__cliente[db_nombre]
         self.__usuarios = self.__db["usuarios"]

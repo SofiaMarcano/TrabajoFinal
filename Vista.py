@@ -122,7 +122,7 @@ class Loro(QWidget):
 class LoginVista(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(" 🐱Sistema Biomédico - Ingreso")
+        self.setWindowTitle(" 🐱 LoroBytes - Ingreso")
         self.setGeometry(500, 150, 600, 480)
         self.setFixedSize(600, 480)
         self.controlador = None
@@ -251,6 +251,7 @@ class senalesMenuVista(QMainWindow):
         self.parent = parent
         loadUi("archivosUI/senalesVentana.ui",self)
         self.setGeometry(500, 150, 600, 480)
+        self.setWindowTitle("Experto en señales")
         self.setFixedSize(509, 415)
         self.setup()
 
@@ -284,6 +285,7 @@ class elegirSenalVentana(QMainWindow):
         super().__init__(parent)
         self.parent = parent
         loadUi("archivosUI/elegirSenalVentana.ui",self)
+        self.setWindowTitle("Elegir señal")
         self.setGeometry(500, 150, 600, 480)
         self.setFixedSize(755, 465)
         self.setup()
@@ -346,6 +348,7 @@ class ElegirLlave(QMainWindow):
         super().__init__(parent)
         self.parent = parent
         loadUi("archivosUI/elegirLlaveVentana.ui",self)
+        self.setWindowTitle("Elegir llave")
         self.setGeometry(500, 150, 600, 480)
         self.setFixedSize(755, 465)
         self.setup()
@@ -501,6 +504,7 @@ class senalVista(QMainWindow):
         super().__init__(parent)
         loadUi("archivosUI/senales.ui",self)
         self.setGeometry(500, 150, 600, 480)
+        self.setWindowTitle("Procesamiento de señales")
         self.setFixedSize(755, 465)
         self.parent = parent
         self.setup()
