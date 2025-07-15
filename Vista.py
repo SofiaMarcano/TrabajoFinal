@@ -1481,11 +1481,12 @@ class VistaImagenesMedicas(QMainWindow):
         self.mostrar_imagen_archivo(os.path.join(ruta_base, "img", "img_dummies_planosAnatomicos", "axial.jpg"), self.plano_Axial)
         self.mostrar_imagen_archivo(os.path.join(ruta_base, "img", "img_dummies_planosAnatomicos", "sagital.jpg"), self.plano_Sagital)
         self.mostrar_imagen_archivo(os.path.join(ruta_base, "img", "img_dummies_planosAnatomicos", "coronal.jpg"), self.plano_Coronal)
-
+        print("Se ejecutó mostrar imagenes por defecto")
+        
     def mostrar_imagen_archivo(self, ruta, label):
         pixmap = QPixmap(ruta)
         label.setPixmap(pixmap)
-
+        print("Se ejecutó mostrar imagen")
     def volver(self):
         self.close()
         if self.parent is not None:
