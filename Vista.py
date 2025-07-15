@@ -1409,6 +1409,7 @@ class VistaImagenesMedicas(QMainWindow):
         super().__init__()
         self.parent = parent
         loadUi("archivosUI/imagenMedicaPanel_ventana.ui", self)
+        self.setWindowTitle("Visor de Imágenes Médicas 🩻")
         self.__controlador = None
         self.mostrar_imagenes_por_defecto()
 
@@ -1485,8 +1486,23 @@ class VistaImagenesMedicas(QMainWindow):
         
     def mostrar_imagen_archivo(self, ruta, label):
         pixmap = QPixmap(ruta)
-        label.setPixmap(pixmap)
-        print("Se ejecutó mostrar imagen")
+        if pixmap.isNull():
+            # Si no se puede cargar, muestra texto bonito
+            emojis = {
+                "plano_Axial": "🧠",
+                "plano_Sagital": "💀",
+                "plano_Coronal": "🫀"
+            }
+            nombre_label = label.objectName()
+            emoji = emojis.get(nombre_label, "🩻")
+            label.setText(f"{emoji} [Plano {nombre_label.split('_')[-1]}]")
+            label.setStyleSheet("color: white; font-size: 20px; font-weight: bold; background-color: #007ACC;")
+            label.setAlignment(Qt.AlignCenter)
+        else:
+            label.setPixmap(pixmap)
+
+
+        
     def volver(self):
         self.close()
         if self.parent is not None:
@@ -1511,59 +1527,62 @@ class VistaImagenesMedicas(QMainWindow):
     def mostrar_advertencia(self, titulo, mensaje):
         QMessageBox.warning(self, titulo, mensaje)
         
+        
 class ModificarMetadatos(QDialog):
     def __init__(self, info_actual, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Modificar Metadatos")
         self.resize(300, 200)
-        from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QComboBox
+
+        # Fondo azul profesional
+        palette = self.palette()
+        palette.setColor(QPalette.Window, QColor("#e0f0ff"))  # azul muy suave
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
 
         layout = QVBoxLayout()
 
+        # Función para crear campos con etiquetas en negrita
+        def crear_campo(titulo, widget):
+            lbl = QLabel(titulo)
+            lbl.setFont(QFont("Arial", weight=QFont.Bold))
+            cont = QHBoxLayout()
+            cont.addWidget(lbl)
+            cont.addWidget(widget)
+            layout.addLayout(cont)
+
         # Nombre
-        layout_nombre = QHBoxLayout()
-        layout_nombre.addWidget(QLabel("Nombre:"))
         self.lineEdit_Nombre = QLineEdit(str(info_actual.get("PatientName", "")))
-        layout_nombre.addWidget(self.lineEdit_Nombre)
-        layout.addLayout(layout_nombre)
+        crear_campo("Nombre:", self.lineEdit_Nombre)
 
         # ID
-        layout_id = QHBoxLayout()
-        layout_id.addWidget(QLabel("ID:"))
         self.lineEdit_ID = QLineEdit(str(info_actual.get("PatientID", "")))
-        layout_id.addWidget(self.lineEdit_ID)
-        layout.addLayout(layout_id)
+        crear_campo("ID:", self.lineEdit_ID)
 
         # Sexo
-        layout_sexo = QHBoxLayout()
-        layout_sexo.addWidget(QLabel("Sexo:"))
         self.comboBox_Sexo = QComboBox()
         self.comboBox_Sexo.addItems(["M", "F", "O"])
         self.comboBox_Sexo.setCurrentText(str(info_actual.get("PatientSex", "")))
-        layout_sexo.addWidget(self.comboBox_Sexo)
-        layout.addLayout(layout_sexo)
+        crear_campo("Sexo:", self.comboBox_Sexo)
 
         # Descripción
-        layout_descrip = QHBoxLayout()
-        layout_descrip.addWidget(QLabel("Descripción:"))
         self.lineEdit_descrip = QLineEdit(str(info_actual.get("StudyDescription", "")))
-        layout_descrip.addWidget(self.lineEdit_descrip)
-        layout.addLayout(layout_descrip)
+        crear_campo("Descripción:", self.lineEdit_descrip)
 
-        # Botones
+        # Botones con estilo
         layout_botones = QHBoxLayout()
         self.boton_Guardar = QPushButton("Guardar")
         self.boton_Cancelar = QPushButton("Cancelar")
+        for b in [self.boton_Guardar, self.boton_Cancelar]:
+            b.setStyleSheet("background-color: #007ACC; color: white; padding: 5px; border-radius: 5px;")
         layout_botones.addWidget(self.boton_Guardar)
         layout_botones.addWidget(self.boton_Cancelar)
         layout.addLayout(layout_botones)
-
         self.setLayout(layout)
-
+        
         # Conexiones
         self.boton_Guardar.clicked.connect(self.accept)
         self.boton_Cancelar.clicked.connect(self.reject)
-
     def obtener_datos(self):
         return {
             "PatientName": self.lineEdit_Nombre.text(),
