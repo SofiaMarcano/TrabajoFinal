@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import datetime
 import pandas as pd
+
 class ConexionMongo:
 
 ############################################LOGIN#######################################
@@ -156,7 +157,7 @@ class ConexionMongo:
             print("Imagen ya registrada con ese proceso.")
             return False
         
-        fecha_registro = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        fecha_registro = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
         registro = {
             "tipo_archivo": "imagen",
@@ -168,5 +169,5 @@ class ConexionMongo:
     }
 
         self.__db["registro_archivos_imagenes"].insert_one(registro)
-        print(f"Imagen registrada correctamente en base con ruta: {ruta_archivo}")
+        #print(f"Imagen registrada correctamente en base con ruta: {ruta_archivo}")
         return True
