@@ -1,4 +1,5 @@
 ####### LINK GITHUB #####
+##### INTEGRANTES
 ### https://github.com/SofiaMarcano/TrabajoFinal.git
 
 def rev_num(msj):
@@ -65,31 +66,3 @@ if __name__ == "__main__":
     app_biomedica = AppBioMedica()
     app_biomedica.ejecute()
 
-
-
-
-
-
-# class AppBioMedica:
-#     def __init__(self):
-#         self.app = QApplication(sys.argv)
-
-#         # Conexión e inicialización de MongoDB
-#         self.mongo = ConexionMongo()
-#         m = self.mongo.ver_o_create()
-
-#         # MVC
-#         self.vista = LoginVista()
-#         self.modelo = ModeloBase(self.mongo)
-#         self.controlador = LoginControlador(self.vista, self.modelo)
-#         self.vista.set_controlador(self.controlador)
-#         if m:
-#             self.controlador.see_inicio(m)
-
-#     def ejecute(self):
-#         self.vista.show()
-#         sys.exit(self.app.exec_())
-
-# if __name__ == "__main__":
-#     aplicacion = AppBioMedica()
-#     aplicacion.ejecute()
