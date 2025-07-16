@@ -1,6 +1,12 @@
-####### LINK GITHUB #####
 ##### INTEGRANTES Sofía Marcano, Daniela Donado, William Mora, Carmen Samaniego
+
+####### LINK GITHUB #####
 ### https://github.com/SofiaMarcano/TrabajoFinal.git
+
+
+####### LINK UML #########
+### https://lucid.app/lucidchart/b56a9394-b848-4cd5-95fe-f19e848006e4/edit?viewport_loc=-2111%2C-4139%2C10274%2C4271%2C0_0&invitationId=inv_c976863e-1162-47e8-a03f-ffa761e7a904
+
 
 def rev_num(msj):
     while True:
