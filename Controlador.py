@@ -84,10 +84,6 @@ class Controlador:
             self.panel = VistaImagenesMedicas(self.vista)
             self.panel.setControlador(self)
             self.panel.show()
-        elif tipo == "imagenMed":
-            self.panel = VistaImagenesMedicas(self.vista)
-            self.panel.setControlador(self)
-            self.panel.show()
 
     def see_inicio(self, mensajes):
         # Mostrar mensajes de inicio como la creación de base de datos con tiempo
