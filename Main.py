@@ -1,5 +1,5 @@
 ####### LINK GITHUB #####
-##### INTEGRANTES
+##### INTEGRANTES Sofía Marcano, Daniela Donado, William Mora, Carmen Samaniego
 ### https://github.com/SofiaMarcano/TrabajoFinal.git
 
 def rev_num(msj):
